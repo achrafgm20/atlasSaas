@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 
 
 const formShema = z.object({
-  rule: z.enum(["Buyer", "Seller"], "Select a role"),
+  role: z.enum(["Buyer", "Seller"], "Select a role"),
   name: z.string().min(2, "Name must be at least 2 characters long"),
   email: z.email("Invalid email address"),
   password: z.string().min(8, "Password must be at least 8 characters long"),
@@ -20,7 +20,7 @@ function FormCreate() {
   const form = useForm<FormValues>({
     resolver: zodResolver(formShema),
     defaultValues: {
-      rule: "Buyer",
+      role: "Buyer",
       name: "",
       email: "",
       password: "",
@@ -49,6 +49,7 @@ function FormCreate() {
     }
     form.reset();
     console.log(data);
+    navigate('/Home');
     
   }
   return (
@@ -63,12 +64,12 @@ function FormCreate() {
                 </FieldDescription>
                 <FieldGroup>
                   <Controller
-                    name="rule"
+                    name="role"
                     control={form.control}
                     defaultValue="Buyer"
                     render={({ field }) => (
                       <Field>
-                        <FieldLabel htmlFor="rule">
+                        <FieldLabel htmlFor="role">
                           Select your role
                         </FieldLabel>
                       <div className="flex w-full justify-center gap-2">
