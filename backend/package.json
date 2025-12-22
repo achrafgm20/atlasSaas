@@ -16,13 +16,11 @@
   },
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only server.ts",
-  "build": "tsc",
-  "start": "node dist/server.js"
-
+    "build": "tsc",
+    "start": "node dist/server.js"
   },
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "server.ts",
   "dependencies": {
     "accepts": "^2.0.0",
@@ -133,5 +131,6 @@
   },
   "keywords": [],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "description": ""
 }
