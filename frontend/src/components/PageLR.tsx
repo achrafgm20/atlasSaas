@@ -8,16 +8,16 @@ export default function LoginPage() {
           
         </div>
         <div className="flex flex-1 items-center justify-center">
-          <div className="w-full">
+          <div className="w-full justify-center items-center max-w-md">
             <Login />
           </div>
         </div>
       </div>
       <div className="bg-muted relative hidden lg:block">
         <img
-          src="/placeholder.svg"
-          alt="Image"
-          className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
+          src="https://images.unsplash.com/photo-1766324934839-313529832615?q=80&w=687&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+          alt="Login"
+          className="absolute inset-0 h-full w-full object-cover"
         />
       </div>
     </div>

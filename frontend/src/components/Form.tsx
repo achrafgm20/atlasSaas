@@ -49,7 +49,7 @@ function FormCreate() {
     }
     form.reset();
     console.log(data);
-    navigate('/Home');
+    
     
   }
   return (

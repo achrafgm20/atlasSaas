@@ -5,6 +5,7 @@ import NavBar from './components/NavBar';
 import LoginPage from './components/PageLR';
 import FormCreate from './components/Form';
 
+
 function App() {
   
 
@@ -15,6 +16,7 @@ function App() {
       <Routes>
           <Route path='/regiter' element={<FormCreate />} />
           <Route path='/login' element={<LoginPage />} />
+          
       </Routes>
     </BrowserRouter>
       
