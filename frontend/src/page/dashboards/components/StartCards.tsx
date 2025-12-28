@@ -8,10 +8,10 @@ export default function StartCards() {
         { label: 'Pending Messages', value: '19', color: 'text-orange-500 border-orange-100' },
     ]
   return (
-    <div className="flex gap-4 w-auto justify-center flex-wrap">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {
             cards.map((card,index)=>(
-                <div key={index} className='bg-white text-xl  flex flex-col rounded-sm justify-center  items-center p-5  border-slate-100 shadow-sm'>
+                <div key={index} className='bg-white text-xl h-30  flex flex-col rounded-xl justify-center  items-start p-5  border-slate-100 shadow-sm'>
                     <h1>{card.label}</h1>
                     <h1 className={card.color}>{card.value}</h1>
                 </div>

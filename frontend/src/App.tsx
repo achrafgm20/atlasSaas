@@ -20,7 +20,7 @@ function App() {
             <Route path='/' element={<Home />} />
             <Route path='/regiter' element={<FormCreate />} />
             <Route path='/login' element={<LoginPage />} />
-          <Route path="/dashboard/seller" element={<SellerDashboard />} />
+            <Route path="/dashboard/seller" element={<SellerDashboard />} />
       </Routes>
     </BrowserRouter>
       
