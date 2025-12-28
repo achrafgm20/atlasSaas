@@ -41,9 +41,9 @@ function Login() {
     }catch(error){
       console.error('Error logging in:', error);
     }
-   console.log(values);
+   console.log(values); 
    
-   
+
 }
 
   const form = useForm<loginFormValues>({
