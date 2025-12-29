@@ -1,6 +1,6 @@
 import type { Request,Response } from 'express';
 import asyncHandler = require("express-async-handler");
-import User from "../models/userModel"
+import User, { IUser } from "../models/userModel"
 import bcrypt = require("bcrypt");
 import jwt = require("jsonwebtoken");
 // function register 
@@ -58,12 +58,20 @@ export const loginUser = asyncHandler (async (req:Request,res:Response) => {
         return 
     }
 })
+
+
 // function retourne me 
 export const getMe = asyncHandler(async (req:Request,res:Response) => {
-    const authHeader = req.headers.authorization
-    if(!authHeader ){
-        
-    }
+        if(!req.user){
+             res.status(400).json({message:"user id missing from request "})
+             return 
+        }
+        const user:IUser | null = await User.findById(req.user).select("-password")
+        if(!user){
+            res.status(404).json({message:"user not found"})
+            return
+        }
+        res.status(200).json(user)
 })
 
 

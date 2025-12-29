@@ -15,11 +15,11 @@
     "typescript": "^5.9.3"
   },
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only server.ts",
+  "dev": "ts-node-dev --respawn --transpile-only server.ts",
   "build": "tsc",
   "start": "node dist/server.js"
+},
 
-  },
   "name": "backend",
   "version": "1.0.0",
   "description": "",
