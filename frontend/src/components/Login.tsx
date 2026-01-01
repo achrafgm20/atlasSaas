@@ -20,6 +20,7 @@ type loginFormValues = z.infer<typeof formSchema>;
 function Login() {
   const navigate = useNavigate();
   const [error , setError] = useState<string | null>(null);
+  
 
   async function onSubmit(values: loginFormValues){
     try{
@@ -36,13 +37,16 @@ function Login() {
       }else{
         const result = await response.json();
         console.log('User logged in successfully:', result);
+        localStorage.setItem('userInfo', JSON.stringify(result));
         setError(null);
+        navigate('/dashboard');
       }
     }catch(error){
       console.error('Error logging in:', error);
     }
    console.log(values); 
    
+
 
 }
 
