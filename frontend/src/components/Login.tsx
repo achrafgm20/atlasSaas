@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
 import { Input } from './ui/input';
 import { useState } from 'react';
+import { UseAuth } from '../context/AuthContext';
 
 
 
@@ -20,6 +21,7 @@ type loginFormValues = z.infer<typeof formSchema>;
 function Login() {
   const navigate = useNavigate();
   const [error , setError] = useState<string | null>(null);
+  const { login } = UseAuth();
   
 
   async function onSubmit(values: loginFormValues){
@@ -37,7 +39,11 @@ function Login() {
       }else{
         const result = await response.json();
         console.log('User logged in successfully:', result);
-        localStorage.setItem('userInfo', JSON.stringify(result));
+        
+        // Extract user and token from response and update AuthContext
+        const user = result.user || result;
+        const token = result.token || result.access_token;
+        login(user, token);
         setError(null);
         navigate('/dashboard');
       }

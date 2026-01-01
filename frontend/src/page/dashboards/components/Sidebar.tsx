@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import logo from '../../../assets/logoAtlas.png'
 function Sidebar() {
+    
     const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/seller' },
   { name: 'Products', icon: Package, path: '/dashboard/products' },

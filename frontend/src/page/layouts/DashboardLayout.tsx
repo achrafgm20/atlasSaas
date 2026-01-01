@@ -1,8 +1,10 @@
 
+import { UseAuth } from '@/context/AuthContext';
 import Sidebar from '../dashboards/components/Sidebar'
 import { Outlet } from 'react-router-dom'
 
 export default function DashboardLayout() {
+  const { user } = UseAuth();
   return (
     <>
         <section className="flex min-h-screen bg-[#1E3A8A]">
@@ -10,7 +12,7 @@ export default function DashboardLayout() {
             <div className="flex-1  bg-[#F5F7FB]">
               <header className="flex items-center justify-between px-8 py-4 border-b bg-white sticky z-10">
                 <h1>Seller Dashboard</h1>
-                <h2>User info</h2>
+                <h2 className='bg-blue-400 p-2 rounded-3xl text-white font-semibold'>{user?.name}</h2>
               </header>
               <div className="px-8 py-4">
                 <Outlet />
