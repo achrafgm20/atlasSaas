@@ -18,3 +18,8 @@ lucide-react \
 @radix-ui/react-label \
 @radix-ui/react-separator \
 
+
+<!-- backend of product upload image -->
+npm install multer
+npm install --save-dev @types/multer
+
