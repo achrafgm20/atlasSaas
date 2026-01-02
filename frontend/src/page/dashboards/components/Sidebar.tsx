@@ -5,11 +5,13 @@ import {
   ShoppingCart,
   MessageSquare,
   BarChart3,
-  LogOut
+  LogOut,
+  
 } from "lucide-react";
 import logo from '../../../assets/logoAtlas.png'
+import { UseAuth } from "@/context/AuthContext";
 function Sidebar() {
-    
+    const {logout} = UseAuth()
     const navItems = [
   { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/seller' },
   { name: 'Products', icon: Package, path: '/dashboard/products' },
@@ -35,7 +37,7 @@ function Sidebar() {
                 isActive ? 'bg-sky-500 text-white shadow-lg shadow-sky-500/20' : 'hover:bg-slate-800'}` }>
                     <div className="flex items-center">
                         <item.icon size={20} />
-                        <span className="ml-2">{item.name}</span>
+                        <span className="ml-2"> {item.name}</span>
                     </div>
 
                 </NavLink>))}
@@ -43,10 +45,11 @@ function Sidebar() {
         </div>
         
         <div className="p-4  border-t border-slate-300/50">
-            <NavLink to="/" className="flex text-white  items-center gap-3 p-3 w-full hover:bg-slate-800 rounded-xl transition-all">
+            <button onClick={() =>logout()} className="flex text-white cursor-pointer  items-center gap-3 p-3 w-full hover:bg-slate-800 rounded-xl transition-all">   
                     <LogOut size={20} />
                     <span>Logout</span>
-            </NavLink>
+            </button>
+            
         </div>
     </div>
   )

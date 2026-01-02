@@ -1,3 +1,4 @@
+import CarteUI from "../dashboards/components/CarteUI";
 import FilterPanel from "../dashboards/components/FilterPanel";
 import FormBtn from "../dashboards/components/FormBtn";
 
@@ -17,7 +18,7 @@ export default function ProductsPage() {
         <FilterPanel />
       </div>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-1  lg:grid-cols-3 xl:grid-cols-4 gap-6">
-        
+        <CarteUI />
       </div>
       
     </div>

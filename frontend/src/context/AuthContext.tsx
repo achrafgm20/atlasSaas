@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
+
 interface User {
   id: string;
   name: string;
@@ -12,11 +13,13 @@ interface AuthContextType {
   token: string | null;
   login: (user: User, token: string) => void;
   logout: () => void;
+  fetchUser: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+  
   // Initialize user state from localStorage
   const [user, setUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
@@ -54,8 +57,31 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('token');
   };
 
+  const fetchUser = async () => {
+    const storedToken = localStorage.getItem('token');
+    if (!storedToken) return;
+
+    try {
+      const response = await fetch('http://localhost:4000/api/users/me', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${storedToken}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData);
+        localStorage.setItem('user', JSON.stringify(userData));
+      }
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, token, login, logout }}>
+    <AuthContext.Provider value={{ user, token, login, logout, fetchUser }}>
       {children}
     </AuthContext.Provider>
   );

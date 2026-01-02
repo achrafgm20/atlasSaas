@@ -8,7 +8,7 @@ const SellerRoute = () => {
 
   // Check if user is authenticated and has the 'seller' role
   if (!token || !user || user.role !== 'Seller' ) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <Outlet />;
