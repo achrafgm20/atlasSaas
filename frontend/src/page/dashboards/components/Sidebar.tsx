@@ -20,7 +20,7 @@ function Sidebar() {
   { name: 'Sales Overview', icon: BarChart3, path: '/dashboard/sales' },
 ];
   return (
-    <div className="flex flex-col py-5 justify-between w-64 h-screen ">
+    <div className="flex flex-col py-5 justify-between w-64 h-auto ">
         <div className="flex flex-col ">
             <div className="flex justify-center pb-5 border-b border-slate-300/50 items-center   ">
                 <img src={logo} alt="logo" className="w-20 h-10 " />

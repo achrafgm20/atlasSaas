@@ -1,22 +1,11 @@
 import img from '@/assets/22.jpg'
 import { Eye, Pencil, Trash } from 'lucide-react'
-export default function CarteUI() {
-  const product = {
-    battery: "100%",
-    category: "phone",
-    color: "red",
-    condition: "grade-a",
-    costPrice: "1000",
-    description: "description",
-    images: [], // Placeholder for the File array
-    listingPrice: "1200",
-    productName: "iphone 11 ",
-    status: "active",
-    storage: "128GB"
-  };
+
+export default function CarteUI({product}: any) {
+
 
   return (
-    <div className="flex flex-col w-auto p-2 bg-gray-400 hover:shadow-xl  rounded-xl">
+    <div className="flex flex-col w-auto p-2  shadow-md bg-white hover:shadow-xl  rounded-xl">
         <img src={img} alt='img' className='bg-cover'/>
         <div className='flex justify-around p-2 border-b-2 border-gray-200'>
             <p className='bg-green-200 font-semibold py-0.5 px-2 rounded-xl capitalize'>{product.status}</p>
@@ -32,8 +21,7 @@ export default function CarteUI() {
                 <p>{product.battery}</p>
             </div>
             <div className='flex justify-around py-2'>
-                <p>Cost Price {product.costPrice}</p>
-                <p className='text-xl '> {product.listingPrice}Dh</p> 
+                <p className='text-xl '>Selling {product.listingPrice}Dh</p> 
             </div>
             <div className='flex justify-around'>
                 <button className='bg-gray-100 px-4 py-1 rounded-2xl cursor-pointer hover:bg-blue-200'><Eye size={20} /></button>

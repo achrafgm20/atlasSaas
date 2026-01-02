@@ -43,6 +43,7 @@ function FormCreate() {
         }else{
             const result = await response.json();
             console.log('User registered successfully:', result);
+            navigate('/login');
         }
     }catch(error){
         console.error('Error registering user:', error);
