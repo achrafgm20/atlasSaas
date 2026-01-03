@@ -22,7 +22,7 @@ export const addProduct = asyncHandler(async(req:Request,res:Response)=> {
             publicId:file.filename
         }))
     }
-    console.log("req.files:", req.files);
+    // console.log("req.files:", req.files);
 
 
     const sellerId = req.user as string

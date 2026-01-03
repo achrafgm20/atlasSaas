@@ -34,5 +34,9 @@ const upload = multer({
     storage,fileFilter,limits:{fileSize:5*1024*1024} //5MB max
 })
 
+console.log("DIRNAME:", __dirname);
+console.log("UPLOADS PATH:", path.join(__dirname, "../uploads"));
+
+
 
 export default upload
