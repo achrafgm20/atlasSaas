@@ -17,8 +17,7 @@ export interface IProduct extends Document {
     storage?:"64GB"|"128GB"|"256GB"|"512GB"|"1TB";
     seller:Types.ObjectId;
     createdAt: Date;
-    updatedAt: Date;
-    
+    updatedAt: Date; 
 }
 
 const ProductSchema = new Schema<IProduct> (
