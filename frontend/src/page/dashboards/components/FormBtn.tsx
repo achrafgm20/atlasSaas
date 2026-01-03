@@ -21,6 +21,11 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import {Plus, Upload } from "lucide-react";
+import axios from "axios";
+import { AlertDemo } from "./AlertForm";
+
+
+
 
 const initialFormData = {
   productName: "",
@@ -38,6 +43,7 @@ const initialFormData = {
 
 export default function FormBtn() {
   const [open, setOpen] = useState(false);
+  const [showAlert, setShowAlert] = useState(false);
   // 1. Centralized State for all form information
   const [formData, setFormData] = useState(initialFormData);
 
@@ -83,18 +89,71 @@ export default function FormBtn() {
     }
   }, [open]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Final Product Data:", formData);
+  const capitalize = (value: string) =>
+  value.charAt(0).toUpperCase() + value.slice(1);
 
-    // You can call your API here
+const formatCondition = (value: string) => {
+  if (value === "new") return "Brand New";
+  if (value === "grade-a") return "Grade A";
+  if (value === "grade-b") return "Grade B";
+  if (value === "fair") return "Fair";
+  return value;
+};
+
+    
+  const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+
+  const token = localStorage.getItem("token");
+  if (!token) return;
+
+  try {
+    const productData = new FormData();
+
+    productData.append("productName", formData.productName);
+    productData.append("battery", formData.battery); // e.g. "3200mAh"
+    productData.append("category", capitalize(formData.category)); // Phone
+    productData.append("color", formData.color);
+    productData.append("condition", formatCondition(formData.condition)); // Brand New
+    productData.append("costPrice", String(formData.costPrice));
+    productData.append("listingPrice", String(formData.listingPrice));
+    productData.append("description", formData.description);
+    productData.append("status", capitalize(formData.status)); // Active
+    productData.append("storage", formData.storage);
+
+    // 👇 IMPORTANT: same key "images" repeated
+    formData.images.forEach((image) => {
+      if (image instanceof File) {
+        productData.append("images", image);
+      }
+    });
+
+    await axios.post(
+      "http://localhost:4000/api/product/addProduct",
+      productData,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "multipart/form-data",
+        },
+      }
+    );
+    console.log("Product added successfully!");
+    setShowAlert(true);
     setOpen(false);
-  };
+    setTimeout(() => setShowAlert(false), 3000);
+  } catch (error) {
+    console.error("Error adding product:", error);
+  }
+};
+
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <>
+    {showAlert && <div className="fixed top-5 right-5 z-50"><AlertDemo /></div>}
+    <Dialog  open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-sky-500 hover:bg-sky-600 font-semibold">
+        <Button className="bg-sky-500 hover:bg-sky-600 font-semibold cursor-pointer">
           <Plus className="mr-2 h-4 w-4" /> Add Product
         </Button>
       </DialogTrigger>
@@ -262,5 +321,6 @@ export default function FormBtn() {
         </form>
       </DialogContent>
     </Dialog>
+    </>
   );
 }
