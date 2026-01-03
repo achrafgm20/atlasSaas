@@ -62,7 +62,7 @@ export default function ProductsPage() {
       <div className="flex gap-8">
         <FilterPanel   />
       </div>
-      <div className="flex-1 grid grid-cols-1 md:grid-cols-3 xl:grid-cols-4   gap-6">
+      <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4  gap-6">
         
         {products.map((product) => (
           <CarteUI key={product._id} product={product} />

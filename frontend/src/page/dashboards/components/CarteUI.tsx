@@ -21,10 +21,11 @@ export default function CarteUI({product}: any) {
         return null;
     }
   }
+  console.log(product)
   return (
     <div className="flex flex-col w-auto p-2  shadow-md bg-white hover:shadow-xl  rounded-xl">
-        <div className='relative'>
-            <img src={img} alt='img' className='bg-cover'/>
+        <div className='relative '>
+            <img src={`http://localhost:4000${product.images[0].url}`} alt='img' className='bg-cover w-80 '/>
             <span className='absolute top-4 right-3'>
                 <p className={` capitalize px-3 py-1 rounded-full font-semibold ${gradeClass}`}>{product.condition}</p>
             </span>
