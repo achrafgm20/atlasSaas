@@ -11,9 +11,9 @@ import Messages from './page/dashboards/home/Messages';
 import SalesOverview from './page/dashboards/home/SalesOverview';
 import { AuthProvider } from './context/AuthContext';
 import SellerRoute from './page/layouts/SellerRoute';
-import Allproducts from './page/buyerPage/page/Allproducts';
-import Cart from './page/buyerPage/page/Cart';
-import Favorites from './page/buyerPage/page/Favorites';
+import Home from './page/buyerPage/page/Home';
+import PageCart from './page/buyerPage/page/PageCart';
+import PageFavorite from './page/buyerPage/page/PageFavorite';
 
 
 function App() {
@@ -26,9 +26,9 @@ function App() {
     <Routes>
       {/* fatima Routess */}
       <Route element={<MainLayout />}>
-        <Route path='/' element={<Allproducts />} />
-        <Route path='/Cart' element={<Cart />} />
-        <Route path='/Favorites' element={<Favorites />} />
+        <Route path='/' element={<Home />} />
+        <Route path='/Cart' element={<PageCart />} />
+        <Route path='/Favorites' element={<PageFavorite />} />
         <Route path='/regiter' element={<FormCreate />} />
         <Route path='/login' element={<LoginPage />} />
       </Route>

@@ -10,15 +10,14 @@ export interface IProduct extends Document {
     description:string;
     images: {
         url: string;
-        publicId: string;
+        public_id: string;
     }[];   
     listingPrice:number;
     status:"Active"|"Draft";
     storage?:"64GB"|"128GB"|"256GB"|"512GB"|"1TB";
     seller:Types.ObjectId;
     createdAt: Date;
-    updatedAt: Date;
-    
+    updatedAt: Date; 
 }
 
 const ProductSchema = new Schema<IProduct> (
@@ -30,7 +29,7 @@ const ProductSchema = new Schema<IProduct> (
         condition:{type:String,enum:["Brand New","Grade A","Grade B","Fair"],required:true},
         costPrice:{type:Number,required:true,min:0},
         description:{type:String},
-        images:{type:[{url:{type:String,required:true},publicId:{type:String,required:true}}],default:[]},
+        images:{type:[{url:{type:String,required:true},public_id:{type:String,required:true}}],default:[]},
         listingPrice:{type:Number,required:true,min:0},
         status:{type:String,enum:["Active","Draft"],default:"Active"},
         storage:{type:String,enum:["64GB","128GB","256GB","512GB","1TB"]},
