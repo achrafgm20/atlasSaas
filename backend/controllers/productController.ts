@@ -2,6 +2,8 @@ import asyncHandler from "express-async-handler";
 import type { Request,Response } from "express";
 import User from "../models/userModel";
 import Product from "../models/productModel"
+import cloudinary from "../config/cloudinary";
+import { UploadApiResponse } from "cloudinary";
 export const addProduct = asyncHandler(async(req:Request,res:Response)=> {
     const {productName,battery,category,color,condition,costPrice,description,listingPrice,status,storage} = req.body
     if(!productName || !category || !condition || !costPrice || !listingPrice){
@@ -12,18 +14,29 @@ export const addProduct = asyncHandler(async(req:Request,res:Response)=> {
     res.status(400).json({ message: "Cost price and listing price must be numbers" });
     return;
     }
+    let images: { url: string; public_id: string }[] = [];
 
-    //handle image upload
-    let imgsArray:{url:string,publicId:string}[] = [] 
-    const files = req.files as Express.Multer.File[] | undefined
-    if(files && files.length > 0){
-        imgsArray = files.map((file:Express.Multer.File) => ({
-            url:`/uploads/${file.filename}`,
-            publicId:file.filename
-        }))
+  const files = req.files as Express.Multer.File[];
+
+   if (files && files.length > 0) {
+    for (const file of files) {
+      const result: UploadApiResponse = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "products" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result!);
+          }
+        );
+        stream.end(file.buffer); // send buffer
+      });
+
+      images.push({
+        url: result.secure_url,
+        public_id: result.public_id,
+      });
     }
-    // console.log("req.files:", req.files);
-
+  }
 
     const sellerId = req.user as string
     // const sellerId = (req.user as any)._id || (req.user as any).id;
@@ -33,7 +46,7 @@ export const addProduct = asyncHandler(async(req:Request,res:Response)=> {
         res.status(403).json({message:"Only sellers can create product"})
         return
     }
-    const product = await Product.create({productName,battery,category,color,condition,costPrice,listingPrice,description,status,storage,seller: sellerId,images: imgsArray})
+    const product = await Product.create({productName,battery,category,color,condition,costPrice,listingPrice,description,status,storage,seller: sellerId,images})
     res.status(201).json(product)
 })
 
@@ -181,3 +194,87 @@ export const filterProductClient = asyncHandler(async(req:Request,res:Response) 
         res.status(400).json({message:"Err fetching products"})
     }
 })
+
+
+
+export const deleteProduct = asyncHandler(async (req:Request,res:Response):Promise<void>=> {
+    try {
+        const {id} = req.params
+        const product = await Product.findById(id)
+        if(!product){
+         res.status(404).json({message:"can not find this product"})
+         return 
+        }
+        if(product.images && product.images.length > 0){
+            for(let i = 0 ; i < product.images.length ; i++){
+                try{
+                    await cloudinary.uploader.destroy(product.images[i].public_id)
+                }catch(err){  
+                    console.error(`failde to delete image ${product.images[i].public_id}`,err);
+            }
+            }
+        } {
+        }
+        await Product.findByIdAndDelete(id)
+        res.status(200).json({product,message:"product deleted succesfully with related images"})
+
+    }catch(err){
+        res.status(400).json({message:"err deleting product"})
+        console.error("error deleting product",err);
+    }
+})
+
+
+
+export const editProduct = asyncHandler(async(req:Request,res:Response) => {
+    try{
+        const {id} = req.params
+        const {productName,battery,category,color,condition,costPrice,description,listingPrice,status,storage} = req.body
+        const product = await Product.findById(id)
+        if(!product){
+            res.status(404).json({message:"product not found "})
+            return 
+        }
+        const sellerId = req.user as string 
+        const sellerExist = await User.findById(sellerId)
+        if(!sellerExist || sellerExist.role !== "Seller"){
+            res.status(403).json({message:"Only sellers can create product"})
+            return 
+        }
+        if (productName) product.productName = productName;
+        if (battery) product.battery = battery;
+        if (category) product.category = category;
+        if (color) product.color = color;
+        if (condition) product.condition = condition;
+        if (costPrice) product.costPrice = costPrice;
+        if (description) product.description = description;
+        if (listingPrice) product.listingPrice = listingPrice;
+        if (status) product.status = status;
+        if (storage) product.storage = storage;
+        const files = req.files as Express.Multer.File[]
+        if(files && files.length > 0){
+            for(let i = 0 ; i < files.length ; i++){
+                try{
+                    const result:UploadApiResponse = await new Promise((resolve,reject) => {
+                        const stream = cloudinary.uploader.upload_stream({folde:"product"},(error,result) => {
+                            if(error) reject(error)
+                                else resolve(result!)
+                        })
+                        stream.end(files[i].buffer)
+                    })
+                    product.images.push({url:result.secure_url,public_id:result.public_id})
+                }catch(err){
+                    console.error("failed uploading image",err);
+                }
+            }
+        }
+
+        await product.save()
+        res.status(200).json({product,message:"product edit successfully"})
+    }catch(err:any){
+        console.error("failed editing product ",err.message);
+        res.status(404).json({message:"failed editing product",error:err.message})
+        
+    }
+})
+
