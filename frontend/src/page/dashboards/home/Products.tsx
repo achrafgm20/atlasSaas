@@ -5,7 +5,10 @@ import StartCards from "../components/StartCards";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
- interface Product {
+ 
+
+
+interface Product {
   _id: string;
   productName: string;
   listingPrice: number;
@@ -33,7 +36,6 @@ const getProducts = async (): Promise<Product[]> => {
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-//getProducts().then(setProducts);
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -49,9 +51,9 @@ export default function ProductsPage() {
     fetchProducts();
     
     setLoading(true);
-  }, []);
+  }, []); 
  if(loading) return <Loading text="Fetching products..." />
-
+console.log(products)
   return (
     <div className="w-auto space-y-6  ">
       <div className="flex justify-between item ">
@@ -60,14 +62,14 @@ export default function ProductsPage() {
       </div>
       <StartCards  products={products}/>
       <div className="flex gap-8">
-        <FilterPanel   />
+        <FilterPanel />
       </div>
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4  gap-6">
-        
-        {products.map((product) => (
+        {products.length === 0 ?<h1 className="text-center font-semibold ">Welcome you have 0 product you can create product now Click in the Add Product</h1> : 
+        <>{products.map((product) => (
           <CarteUI key={product._id} product={product} />
-        ))}
-        
+        ))}</>
+        }
       </div>
       
     </div>
