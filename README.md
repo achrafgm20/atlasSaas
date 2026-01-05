@@ -23,3 +23,10 @@ lucide-react \
 npm install multer
 npm install --save-dev @types/multer
 
+npm install cloudinary
+<!-- .env we should add this 
+CLOUDINARY_NAME=atlasTechCloud
+CLOUDINARY_API_KEY=123456789012345
+CLOUDINARY_API_SECRET=AbCdEfGhIjKlMnOpQrStUvWxYz
+
+ -->
