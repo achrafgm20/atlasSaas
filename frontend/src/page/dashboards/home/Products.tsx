@@ -33,32 +33,33 @@ const getProducts = async (): Promise<Product[]> => {
   return response.data.products;
 };
 
+
 export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const fetchedProducts = await getProducts();
-        setProducts(fetchedProducts);
-      } catch (error) {
-        console.error("Error fetching products:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProducts();
-    
+   const fetchProducts = async () => {
     setLoading(true);
+    try {
+      const fetchedProducts = await getProducts();
+      setProducts(fetchedProducts);
+    } catch (error) {
+      console.error("Error fetching products:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchProducts();
   }, []); 
+
  if(loading) return <Loading text="Fetching products..." />
-console.log(products)
+
   return (
     <div className="w-auto space-y-6  ">
       <div className="flex justify-between item ">
         <h1>Products Page</h1>
-        <FormBtn  />
+        <FormBtn onProductAdded={fetchProducts} />
       </div>
       <StartCards  products={products}/>
       <div className="flex gap-8">

@@ -11,9 +11,10 @@ import Messages from './page/dashboards/home/Messages';
 import SalesOverview from './page/dashboards/home/SalesOverview';
 import { AuthProvider } from './context/AuthContext';
 import SellerRoute from './page/layouts/SellerRoute';
-import Home from './page/buyerPage/page/Home';
-import PageCart from './page/buyerPage/page/PageCart';
-import PageFavorite from './page/buyerPage/page/PageFavorite';
+import Home from './page/buyerPage/pageBuyer/Home';
+import PageCart from './page/buyerPage/pageBuyer/PageCart';
+import PageFavorite from './page/buyerPage/pageBuyer/PageFavorite';
+import ErrorPage from './page/buyerPage/components/ErrorPage';
 
 
 function App() {
@@ -24,7 +25,7 @@ function App() {
     <AuthProvider>
     <BrowserRouter>
     <Routes>
-      {/* fatima Routess */}
+      {/* Buyer Routess */}
       <Route element={<MainLayout />}>
         <Route path='/' element={<Home />} />
         <Route path='/Cart' element={<PageCart />} />
@@ -33,7 +34,7 @@ function App() {
         <Route path='/login' element={<LoginPage />} />
       </Route>
 
-
+      {/* Seller Routess */}
       <Route element={<SellerRoute />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path='/dashboard/seller' element={<Dashboard />} />
@@ -43,6 +44,8 @@ function App() {
           <Route path='/dashboard/sales' element={<SalesOverview />} />
         </Route>
       </Route>
+      {/* Error page */}
+      <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
     </AuthProvider>

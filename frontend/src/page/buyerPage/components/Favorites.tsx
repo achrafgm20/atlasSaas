@@ -4,7 +4,7 @@ import { Heart } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const Favorites = () => {
-  const [favorites, setFavorites] = useState([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
   const navigate = useNavigate();
 
   const loadFavorites = () => {
@@ -37,7 +37,7 @@ const Favorites = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 w-full">
           {favorites.map(item => (
-            <ProductCard key={item.id} product={item} />
+            <ProductCard key={item._id} product={item} />
           ))}
         </div>
       )}

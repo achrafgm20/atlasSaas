@@ -1,17 +1,17 @@
-import React, { useState, useEffect } from 'react';
+import  { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
 
 const Allproducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const getAllProducts = async () => {
       try {
         setLoading(true);
         // Appel à votre API Express
-        const response = await fetch('http://localhost:5000/api/product/getAllProducts');
+        const response = await fetch('http://localhost:4000/api/product/getAllProducts');
         
         if (!response.ok) throw new Error('Erreur réseau');
         
@@ -21,6 +21,7 @@ const Allproducts = () => {
         // On vérifie si data.products existe avant de le stocker
         if (data && data.products) {
           setProducts(data.products);
+         
         } else {
           setProducts([]);
         }
@@ -61,6 +62,7 @@ const Allproducts = () => {
           ))}
         </div>
       )}
+      
     </div>
   );
 };

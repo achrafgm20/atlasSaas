@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ShieldCheck, Diamond, Zap, Box, CheckCircle, Headphones } from 'lucide-react';
 
@@ -49,16 +50,28 @@ const Header = () => {
   );
 };
 
+interface BadgeProps {
+  icon: React.ReactNode;
+  text: string;
+}
 
-const Badge = ({ icon, text }) => (
+const Badge = ({ icon, text }: BadgeProps) => (
   <div className="flex items-center gap-2 bg-white border border-gray-100 px-5 py-2.5 rounded-full shadow-xl hover:shadow-xl transition-all hover:scale-105 duration-300">
     {icon}
     <span className="text-sm font-bold text-gray-700">{text}</span>
   </div>
 );
 
-const StatCard = ({ icon, iconBg, number, title, desc }) => (
-  <div className="bg-white p-10  h-22 rounded-[32px] shadow-sm border border-gray-50 w-auto h-auto flex flex-col items-center transition-all hover:scale-105 hover:shadow-xl duration-300">
+interface StatCardProps {
+  icon: React.ReactNode;
+  iconBg: string;
+  number: string;
+  title: string;
+  desc: string;
+}
+
+const StatCard = ({ icon, iconBg, number, title, desc }: StatCardProps) => (
+  <div className="bg-white p-10   rounded-[32px] shadow-sm border border-gray-50 w-auto h-auto flex flex-col items-center transition-all hover:scale-105 hover:shadow-xl duration-300">
     <div className={`${iconBg} p-4 rounded-full mb-6 shadow-lg shadow-blue-100`}>
       {icon}
     </div>

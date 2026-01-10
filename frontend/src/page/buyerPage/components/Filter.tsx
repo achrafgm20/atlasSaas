@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import  { useState } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, RotateCcw, Check } from 'lucide-react';
 
 const Filter = () => {
