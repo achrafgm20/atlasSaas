@@ -6,6 +6,7 @@ export interface IUser extends Document {
     role:"Seller"|"Buyer"|"admin"
     statutCompte:Boolean
 }
+
 const userSchema =new  Schema<IUser>(
     {
         name : {
