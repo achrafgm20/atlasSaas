@@ -35,7 +35,7 @@ const Allproducts = () => {
 
     getAllProducts();
   }, []);
-
+console.log(products)
   return (
     <div className="max-w-7xl mx-auto p-4 md:p-8 min-h-screen">
       

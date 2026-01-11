@@ -15,6 +15,8 @@ import Home from './page/buyerPage/pageBuyer/Home';
 import PageCart from './page/buyerPage/pageBuyer/PageCart';
 import PageFavorite from './page/buyerPage/pageBuyer/PageFavorite';
 import ErrorPage from './page/buyerPage/components/ErrorPage';
+import ProductPage from './page/dashboards/home/ProductPage';
+import ProductPageBuyer from './page/buyerPage/pageBuyer/ProductPageBuyer';
 
 
 function App() {
@@ -28,6 +30,7 @@ function App() {
       {/* Buyer Routess */}
       <Route element={<MainLayout />}>
         <Route path='/' element={<Home />} />
+        <Route path='/p' element={<ProductPageBuyer />} />
         <Route path='/Cart' element={<PageCart />} />
         <Route path='/Favorites' element={<PageFavorite />} />
         <Route path='/regiter' element={<FormCreate />} />
@@ -39,6 +42,7 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path='/dashboard/seller' element={<Dashboard />} />
           <Route path='/dashboard/products' element={<Products />} />
+          <Route path='/dashboard/products/:id' element={<ProductPage />} />
           <Route path='/dashboard/Orders' element={<Orders />} />
           <Route path='/dashboard/Messages' element={<Messages />} />
           <Route path='/dashboard/sales' element={<SalesOverview />} />

@@ -124,6 +124,7 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
           {/* Action Buttons */}
           <div className='flex gap-2 pt-2'>
             <button 
+              onClick={()=> navigate(`/dashboard/products/${product._id}`)}
               className='flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 px-4 py-2.5 rounded-xl hover:bg-blue-100 transition-colors duration-200'
               aria-label="View product"
             >
