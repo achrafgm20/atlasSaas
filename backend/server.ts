@@ -9,6 +9,7 @@ import ProductRouter from "./routes/producrRoutes";
 import path from "path";
 import fs from "fs"
 import CartRouter from "./routes/cartRoutes";
+import FavoriteRouter from "./routes/favoriteRoutes";
 const app = express()
 const port = process.env.PORT  || 5000
 connctDB()
@@ -29,6 +30,7 @@ app.use(express.json())
 app.use("/api/users",router)
 app.use("/api/product",ProductRouter)
 app.use("/api/cart",CartRouter)
+app.use("/api/favorite",FavoriteRouter)
 
 //this for uplaod images 
 // app.use("/uploads", express.static(path.join(__dirname, "../uploads")));

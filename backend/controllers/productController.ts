@@ -52,6 +52,8 @@ export const addProduct = asyncHandler(async(req:Request,res:Response)=> {
 
 
 export const getSellersProducts = asyncHandler(async(req:Request,res:Response) => {
+    console.log(req.user);
+
     const sellerId = req.user as string 
     const sellerExist = await User.findById(sellerId)
     if(!sellerExist || sellerExist.role !== "Seller"){
@@ -81,7 +83,7 @@ export const getAllProducts = asyncHandler(async(req:Request,res:Response) => {
         const page = Number(req.query.page) || 1
         const limit = Number(req.query.limit) || 10
         const skip = (page - 1)*limit
-        const products = await Product.find({status:"Active"}).skip(skip).limit(limit).sort({createdAt: -1})
+        const products = await Product.find({status:"Active"}).populate({path:"Seller",select:"name"}).skip(skip).limit(limit).sort({createdAt: -1})
         const totalProduct = await Product.countDocuments({status:"Active"})
         const totalPages = Math.ceil(totalProduct / limit)
         res.status(200).json({
