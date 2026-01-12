@@ -114,7 +114,7 @@ export const filterProductSeller = asyncHandler(async(req:Request,res:Response) 
     }
     try {
         const {keyword,category,minPrice,maxPrice} = req.query 
-        let filter:any = {status:"Active"}
+        let filter:any = {status:"Active",seller:sellerId}
         if(keyword){
             filter.$or=[
                {productName : {$regex:keyword as string,$options:"i"}},
