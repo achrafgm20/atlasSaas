@@ -30,3 +30,7 @@ CLOUDINARY_API_KEY=123456789012345
 CLOUDINARY_API_SECRET=AbCdEfGhIjKlMnOpQrStUvWxYz
 
  -->
+
+
+npm install socket.io
+npm install socket.io-client --save-dev

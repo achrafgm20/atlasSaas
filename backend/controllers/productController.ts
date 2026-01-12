@@ -280,3 +280,19 @@ export const editProduct = asyncHandler(async(req:Request,res:Response) => {
     }
 })
 
+
+
+
+export const detailsProduct = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const {id} = req.params
+        const product = await Product.findById(id).populate({path:"seller",select:"name _id"})
+        res.status(200).json(product)
+    }catch(err){
+        console.error("failde fetched this product details");
+        res.status(404).json({message:"failde fetched this product details"})
+        
+    }
+    
+    
+})
