@@ -1,5 +1,6 @@
 import  { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
+import CardLoader from './CardLoader';
 
 const Allproducts = () => {
   const [products, setProducts] = useState([]);
@@ -46,9 +47,11 @@ const Allproducts = () => {
       </div>
 
       {loading ? (
-        <div className="flex justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-          <p className="ml-4 text-blue-600 font-bold">Loading products...</p>
+        <div className="flex justify-center gap-2  items-center py-20">
+          <CardLoader />
+          <CardLoader />
+          <CardLoader />
+          <CardLoader />
         </div>
       ) : error ? (
         <div className="bg-red-50 text-red-600 p-6 rounded-2xl text-center font-bold">
