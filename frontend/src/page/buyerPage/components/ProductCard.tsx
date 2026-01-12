@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { ShoppingCart, Heart } from 'lucide-react';
 import { moneyDhForma } from '@/lib/utils';
-
+import { BadgeCheck } from 'lucide-react';
+import { Link } from 'react-router-dom';
 interface Product {
   _id: string;
   productName: string;
@@ -11,6 +12,7 @@ interface Product {
   condition: string;
   listingPrice: number;
   battery: string;
+  seller:{_id: number, name: string}
 }
 
 interface ProductCardProps {
@@ -62,6 +64,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
+    <Link to={`/${product._id}`} className="group"> 
     <div className="group bg-white rounded-[24px] overflow-hidden border shadow-blue-500 shadow-sm h hover:shadow-md  duration-300">
       <div className="relative h-72 bg-gray-50">
        
@@ -102,7 +105,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
             <span className="font-bold">{product.color}</span>
           </div>
         </div>
-
+           <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
+            <p className='text-gray-400'>Store:</p>
+            <h2 className='font-semibold'>{product.seller.name}</h2>
+            <BadgeCheck className='text-blue-700' />
+           </div>
         
 
         <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
@@ -117,6 +124,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         </div>
       </div>
     </div>
+    </Link>
   );
 };
 

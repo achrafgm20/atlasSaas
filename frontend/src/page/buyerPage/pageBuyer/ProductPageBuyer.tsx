@@ -1,9 +1,30 @@
 import { Button } from '@/components/ui/button'
 import img from '@/assets/Capture.jpg'
-import { Link } from 'react-router-dom'
+import { Link, useParams } from 'react-router-dom'
+import {  useEffect, useState } from 'react'
+import axios from 'axios'
+
 
 
 export default function ProductPageBuyer() {
+  const [product, setProduct] = useState(null)
+  
+  const {id} = useParams()
+ 
+  // useEffect(() => {
+  //   axios
+  //     .get(`http://localhost:4000/api/product/getProductDetails/${id}`)
+  //     .then((res) => {
+  //       setProduct(res.data);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //     });
+  // }, [id]);
+console.log(id)
+  
+  if (!product) return <p>Product not found</p>;
+  
   return (
     <div className='flex flex-col w-full max-w-7xl mx-auto justify-center mb-6 pt-10  px-4 bg-[#e2edf7]'>
       <div><Button>

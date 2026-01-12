@@ -30,7 +30,7 @@ function App() {
       {/* Buyer Routess */}
       <Route element={<MainLayout />}>
         <Route path='/' element={<Home />} />
-        <Route path='/p' element={<ProductPageBuyer />} />
+        <Route path='/:id' element={<ProductPageBuyer />} />
         <Route path='/Cart' element={<PageCart />} />
         <Route path='/Favorites' element={<PageFavorite />} />
         <Route path='/regiter' element={<FormCreate />} />
