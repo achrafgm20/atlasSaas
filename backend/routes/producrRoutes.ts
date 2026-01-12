@@ -1,5 +1,5 @@
 import express from "express";
-import { addProduct, deleteProduct, editProduct, filterProductClient, filterProductSeller, getAllProducts, getSellersProducts } from "../controllers/productController";
+import { addProduct, deleteProduct, detailsProduct, editProduct, filterProductClient, filterProductSeller, getAllProducts, getSellersProducts } from "../controllers/productController";
 import { protect } from "../middleware/authMiddleware";
 import upload from "../middleware/uploadMiddleware";
 
@@ -11,4 +11,5 @@ ProductRouter.get("/filterProductSeller",protect,filterProductSeller)
 ProductRouter.get("/filterProductClient",filterProductClient)
 ProductRouter.delete("/deleteProduct/:id",protect,deleteProduct)
 ProductRouter.put("/editProdut/:id",protect,upload.array("images"),editProduct)
+ProductRouter.get("/getProductDetails/:id",detailsProduct)
 export default ProductRouter
