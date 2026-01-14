@@ -1,3 +1,4 @@
+import jwt,{verify} from 'jsonwebtoken';
 import express = require("express")
 import cors = require("cors");
 import connctDB from "./config/db"
@@ -14,7 +15,6 @@ import discussionRoute from "./routes/discussionRoute";
 import Message from "./models/message";
 import { createServer } from "http";
 import {Server,Socket} from "socket.io"
-import { socketAuth } from "./middleware/socketAuth";
 
 
 
@@ -63,12 +63,25 @@ const io = new Server(server, {
     credentials: true,
   },
 });
-io.use(socketAuth)
-io.on("connection", (socket) => {
-  console.log("User connected");
+io.on("connection", async(socket) => {
+  try {
+    const token = socket.handshake.auth.token
+    if(!token) {
+      socket.disconnect()
+      return 
+    } 
+
+    const decoded = jwt.verify(token,process.env.JWT_SECRET!) as any
+    socket.data.user = {id:decoded.id}
+      console.log(`User connected ${socket.data.user.id}`);
+
+  }catch(err){
+    socket.disconnect()
+  }
 
   socket.on("joinDiscussion", (discussionId:string) => {
     socket.join(discussionId);
+    console.log(`User with id : ${socket.id} joinde room discussion with id  ${discussionId}`)
   });
 
   socket.on("sendMessage", async ({ discussionId, content }:{discussionId:string,content:string}) => {
@@ -77,12 +90,19 @@ io.on("connection", (socket) => {
     const message = await Message.create({
       discussion: discussionId,
       sender: userId,
-      content
+      content:content
+      // message:new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
     });
 
-    io.to(discussionId).emit("newMessage", message);
+    io.to(discussionId).emit("receiveMessage", message);
   });
+  socket.on("disconnect",() => {
+    console.log("User disconnected ",socket.id)
+  })
 });
+
+
+
 
 
 
