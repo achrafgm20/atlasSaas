@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { ArrowLeft, CheckCircle2, User } from 'lucide-react'; 
 import {moneyDhForma} from '@/lib/utils'
+import Policy from '../components/Policy';
+import ChatApp from '../components/ChatApp';
 
 
 // 2. Define the Image Interface 
@@ -99,7 +101,7 @@ const getConditionStyles = (condition: string): string => {
             </Link>
           </Button>
         </div>
-
+        
         <div className="flex flex-col gap-8 lg:flex-row">
           
           {/* Left Column: Image Gallery */}
@@ -218,6 +220,16 @@ const getConditionStyles = (condition: string): string => {
             </div>
 
           </div>
+          
+        </div>
+        <div className="flex flex-col gap-8 pt-8 lg:flex-row">
+          <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
+            <ChatApp />
+          </div>
+          <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
+              <Policy />
+          </div>
+          
         </div>
       </div>
     </div>

@@ -15,3 +15,8 @@ export function moneyDhForma(m: number) {
         });
   return formatteurMA.format(m);
 }
+
+
+
+
+
