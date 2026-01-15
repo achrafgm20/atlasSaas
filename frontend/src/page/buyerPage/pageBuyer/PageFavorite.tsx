@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Heart } from 'lucide-react';
-import Favorites from "../Components/Favorites";
+import Favorites from "../components/Favorites";
 import { useNavigate } from 'react-router-dom';
 
 const PageFavorite = () => {

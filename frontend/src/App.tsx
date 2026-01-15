@@ -11,9 +11,12 @@ import Messages from './page/dashboards/home/Messages';
 import SalesOverview from './page/dashboards/home/SalesOverview';
 import { AuthProvider } from './context/AuthContext';
 import SellerRoute from './page/layouts/SellerRoute';
-import Home from './page/buyerPage/page/Home';
-import PageCart from './page/buyerPage/page/PageCart';
-import PageFavorite from './page/buyerPage/page/PageFavorite';
+import Home from './page/buyerPage/pageBuyer/Home';
+import PageCart from './page/buyerPage/pageBuyer/PageCart';
+import PageFavorite from './page/buyerPage/pageBuyer/PageFavorite';
+import ErrorPage from './page/buyerPage/components/ErrorPage';
+import ProductPage from './page/dashboards/home/ProductPage';
+import ProductPageBuyer from './page/buyerPage/pageBuyer/ProductPageBuyer';
 
 
 function App() {
@@ -24,25 +27,29 @@ function App() {
     <AuthProvider>
     <BrowserRouter>
     <Routes>
-      {/* fatima Routess */}
+      {/* Buyer Routess */}
       <Route element={<MainLayout />}>
         <Route path='/' element={<Home />} />
+        <Route path='/:id' element={<ProductPageBuyer />} />
         <Route path='/Cart' element={<PageCart />} />
         <Route path='/Favorites' element={<PageFavorite />} />
         <Route path='/regiter' element={<FormCreate />} />
         <Route path='/login' element={<LoginPage />} />
       </Route>
 
-
+      {/* Seller Routess */}
       <Route element={<SellerRoute />}>
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route path='/dashboard/seller' element={<Dashboard />} />
           <Route path='/dashboard/products' element={<Products />} />
+          <Route path='/dashboard/products/:id' element={<ProductPage />} />
           <Route path='/dashboard/Orders' element={<Orders />} />
           <Route path='/dashboard/Messages' element={<Messages />} />
           <Route path='/dashboard/sales' element={<SalesOverview />} />
         </Route>
       </Route>
+      {/* Error page */}
+      <Route path="*" element={<ErrorPage />} />
       </Routes>
     </BrowserRouter>
     </AuthProvider>

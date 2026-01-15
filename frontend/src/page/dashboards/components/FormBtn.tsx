@@ -41,7 +41,13 @@ const initialFormData = {
   images: [null, null, null] as (File | null)[]
 };
 
-export default function FormBtn() {
+type FormBtnProps = {
+  onProductAdded: () => void;
+};
+
+
+
+export default function FormBtn({onProductAdded }:FormBtnProps) {
   const [open, setOpen] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   // 1. Centralized State for all form information
@@ -129,18 +135,21 @@ const formatCondition = (value: string) => {
     });
 
     await axios.post(
-      "http://localhost:4000/api/product/addProduct",
-      productData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
-        },
-      }
-    );
+  "http://localhost:4000/api/product/addProduct",
+  productData,
+  {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  }
+);
+
     console.log("Product added successfully!");
+    onProductAdded(); // ✅ refresh products
+
     setShowAlert(true);
     setOpen(false);
+   
     setTimeout(() => setShowAlert(false), 3000);
   } catch (error) {
     console.error("Error adding product:", error);

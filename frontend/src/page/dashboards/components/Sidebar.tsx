@@ -22,13 +22,10 @@ function Sidebar() {
   return (
     <div className="flex flex-col py-5 justify-between w-64 h-auto ">
         <div className="flex flex-col ">
-            <div className="flex justify-center pb-5 border-b border-slate-300/50 items-center   ">
-                <img src={logo} alt="logo" className="w-20 h-10 " />
-                <div className="flex flex-col mx-4">
-                    <h1 className="text-3xl font-bold text-white">AtlasTech</h1>
-                    <h2 className="text-gray-200">Seller Panel</h2>
-                </div>
-                
+            <div className="flex flex-col justify-center pb-5 border-b border-slate-300/50 items-center   ">
+                <img src={logo} alt="logo" className="w-30 " />               
+                <h2 className="text-gray-200">Seller Panel</h2>
+
             </div>
             
             <div className="flex flex-col text-white p-4 space-y-1">

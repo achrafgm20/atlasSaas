@@ -1,4 +1,4 @@
-import React from 'react';
+
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -9,12 +9,12 @@ const Footer = () => {
         
         <div className="flex-1 max-w-sm">
           <h2 className="text-xl font-bold text-gray-900 mb-4">AtlasTech</h2>
-          <p className="text-gray-500 text-[15px] leading-relaxed max-w-[280px]">
+          <p className="text-gray-500 text-[15px] leading-relaxed max-w-70">
             Your trusted marketplace for premium smartphones and laptops.
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 flex-[2]">
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 flex-2">
           
           <div>
             <h3 className="text-gray-900 font-semibold mb-5">Shop</h3>

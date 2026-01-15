@@ -84,18 +84,34 @@ io.on("connection", async(socket) => {
     console.log(`User with id : ${socket.id} joinde room discussion with id  ${discussionId}`)
   });
 
-  socket.on("sendMessage", async ({ discussionId, content }:{discussionId:string,content:string}) => {
+  // socket.on("sendMessage", async ({ discussionId, content }:{discussionId:string,content:string}) => {
+  //   const userId = socket.data.user.id;
+
+  //   const message = await Message.create({
+  //     discussion: discussionId,
+  //     sender: userId,
+  //     content:content
+  //     // message:new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
+  //   });
+
+  //   io.to(discussionId).emit("receiveMessage", message);
+  // });
+
+  socket.on("sendMessage", async ({ discussionId, content }) => {
     const userId = socket.data.user.id;
 
     const message = await Message.create({
       discussion: discussionId,
       sender: userId,
-      content:content
-      // message:new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
+      content: content
     });
 
-    io.to(discussionId).emit("receiveMessage", message);
-  });
+    // Populate sender before emitting
+    const populatedMessage = await Message.findById(message._id).populate("sender", "name _id");
+
+    io.to(discussionId).emit("receiveMessage", populatedMessage);
+});
+
   socket.on("disconnect",() => {
     console.log("User disconnected ",socket.id)
   })
