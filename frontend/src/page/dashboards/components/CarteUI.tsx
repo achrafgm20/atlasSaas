@@ -88,7 +88,7 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
   
   return (
     <>
-      <div className="flex flex-col justify-between w-auto p-2 shadow-md bg-white hover:shadow-xl rounded-xl">
+      <div className="flex flex-col justify-between  p-2 shadow-md bg-white hover:shadow-xl rounded-xl">
         <div className='relative'>
           <div className='flex justify-center items-center h-64 w-full bg-gray-50 rounded-lg overflow-hidden'>
             <img 

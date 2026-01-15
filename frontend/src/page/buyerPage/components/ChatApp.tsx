@@ -1,60 +1,164 @@
-import React from 'react';
+import { useEffect, useRef, useState } from "react";
+import axios from "axios";
+import { io, Socket } from "socket.io-client";
 
-const CommentUI = () => {
-  // Mock data for UI demonstration
-  const comments = [
-    { id: 1, author: "Alex Johnson", time: "2 hours ago", message: "The quality of this product is amazing! Definitely worth the price." },
-    { id: 2, author: "Sarah Smith", time: "5 hours ago", message: "Fast shipping and great customer support. Highly recommended!" },
-  ];
+// ⚠️ Create socket ONCE (outside component)
+let socket: Socket;
+
+interface Message {
+  _id: string;
+  sender: { name?: string } | string;
+  content: string;
+  createdAt?: string;
+}
+
+interface ChatAppProps {
+  productId: string;
+}
+
+const ChatApp = ({ productId }: ChatAppProps) => {
+  const [comments, setComments] = useState<Message[]>([]);
+  const [message, setMessage] = useState("");
+  const [discussionId, setDiscussionId] = useState<string | null>(null);
+  const hasJoinedRef = useRef(false);
+
+  // 🧠 STEP 1 — Create / get discussion
+  useEffect(() => {
+    const getDiscussion = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(
+          `/api/discussion/getCreatedDiscusion/${productId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (res.data?.discussion?._id) {
+          setDiscussionId(res.data.discussion._id);
+        }
+      } catch (err: any) {
+        console.error("❌ Error getting discussion:", err.response?.data || err.message);
+      }
+    };
+
+    if (productId) getDiscussion();
+  }, [productId]);
+
+  // 📥 STEP 2 — Load messages
+  useEffect(() => {
+    if (!discussionId) return;
+
+    const loadMessages = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`/api/discussion/${discussionId}/messages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        setComments(res.data);
+      } catch (err) {
+        console.error("❌ Error loading messages:", err);
+      }
+    };
+
+    loadMessages();
+  }, [discussionId]);
+
+  // 🔌 STEP 3 — Init socket once
+  useEffect(() => {
+    if (!socket) {
+      socket = io("http://localhost:5000", {
+        auth: { token: localStorage.getItem("token") },
+      });
+    }
+
+    socket.on("receiveMessage", (newMessage: Message) => {
+      setComments((prev) => [...prev, newMessage]);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+    };
+  }, []);
+
+  // 🔗 STEP 4 — Join discussion room
+  useEffect(() => {
+    if (!discussionId || !socket || hasJoinedRef.current) return;
+
+    socket.emit("joinDiscussion", discussionId);
+    hasJoinedRef.current = true;
+  }, [discussionId]);
+
+  // ✉️ STEP 5 — Send message
+  const sendMessage = () => {
+    if (!message.trim() || !discussionId || !socket) return;
+
+    socket.emit("sendMessage", {
+      discussionId,
+      content: message,
+    });
+
+    setMessage("");
+  };
 
   return (
-    <div className="max-w-2xl mx-auto  bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div className="max-w-2xl mx-auto bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
       {/* Header */}
-      <div className="px-6 py-4 border-b border-gray-50 bg-gray-50/50">
-        <h3 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+      <div className="px-6 py-4 border-b bg-gray-50">
+        <h3 className="text-lg font-bold text-gray-800">
           Comments <span className="text-sm font-normal text-gray-500">({comments.length})</span>
         </h3>
       </div>
 
-      {/* Comment List */}
-      <div className="p-6 space-y-6 max-h-100overflow-y-auto">
+      {/* Messages */}
+      <div className="p-6 space-y-6 max-h-96 overflow-y-auto">
         {comments.map((c) => (
-          <div key={c.id} className="flex gap-4">
-            {/* Avatar */}
-            <div className="h-10 w-10 rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white font-semibold shadow-sm flex-shrink-0">
-              {c.author.charAt(0)}
+          <div key={c._id} className="flex gap-4">
+            <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold">
+              {typeof c.sender === "object" && c.sender?.name
+                ? c.sender.name.charAt(0)
+                : "U"}
             </div>
-            
-            {/* Bubble */}
+
             <div className="flex-1">
-              <div className="flex items-baseline justify-between mb-1">
-                <h4 className="font-semibold text-gray-900 text-sm">{c.author}</h4>
-                <span className="text-xs text-gray-400">{c.time}</span>
+              <div className="flex justify-between mb-1">
+                <h4 className="text-sm font-semibold text-gray-900">
+                  {typeof c.sender === "object" ? c.sender?.name || "User" : "User"}
+                </h4>
+                <span className="text-xs text-gray-400">
+                  {c.createdAt ? new Date(c.createdAt).toLocaleTimeString() : ""}
+                </span>
               </div>
-              <div className="bg-gray-50 p-3 rounded-2xl rounded-tl-none border border-gray-100">
-                <p className="text-gray-700 text-sm leading-relaxed">
-                  {c.message}
-                </p>
+              <div className="bg-gray-50 p-3 rounded-2xl border">
+                <p className="text-sm text-gray-700">{c.content}</p>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Input Area */}
-      <div className="p-4 bg-white border-t border-gray-100">
+      {/* Input */}
+      <div className="p-4 border-t bg-white">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-gray-200 flex-shrink-0"></div> {/* User Avatar Placeholder */}
+          <div className="h-8 w-8 rounded-full bg-gray-200" />
+
           <div className="relative flex-1">
             <input
               type="text"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
               placeholder="Add a comment..."
-              className="w-full bg-gray-100 border-none rounded-full py-2 px-5 pr-12 text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white transition-all"
+              className="w-full bg-gray-100 rounded-full py-2 px-5 pr-12 text-sm focus:ring-2 focus:ring-indigo-500"
+              onKeyDown={(e) => e.key === "Enter" && sendMessage()}
             />
-            <button className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z" />
-              </svg>
+
+            <button
+              onClick={sendMessage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-indigo-600 hover:bg-indigo-50 rounded-full"
+            >
+              ➤
             </button>
           </div>
         </div>
@@ -63,4 +167,4 @@ const CommentUI = () => {
   );
 };
 
-export default CommentUI;
+export default ChatApp;

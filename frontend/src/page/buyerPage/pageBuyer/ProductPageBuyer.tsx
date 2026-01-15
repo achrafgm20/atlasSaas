@@ -5,7 +5,8 @@ import axios from 'axios';
 import { ArrowLeft, CheckCircle2, User } from 'lucide-react'; 
 import {moneyDhForma} from '@/lib/utils'
 import Policy from '../components/Policy';
-import ChatApp from '../components/ChatApp';
+import { useCart } from '@/context/CartFavContext';
+// import ChatApp from '../components/ChatApp';
 
 
 // 2. Define the Image Interface 
@@ -42,7 +43,7 @@ export default function ProductPageBuyer() {
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedImage, setSelectedImage] = useState(null);
   const { id } = useParams<{ id: string }>();
-
+  const {addToCart} = useCart();
 
   
 const getConditionStyles = (condition: string): string => {
@@ -187,7 +188,9 @@ const getConditionStyles = (condition: string): string => {
               </h1>
             </div>
 
-            <Button className="w-full bg-blue-600 py-6 text-lg font-semibold hover:bg-blue-700 shadow-lg shadow-blue-200">
+            <Button
+            onClick={()=>addToCart(product._id)}
+            className="w-full cursor-pointer bg-blue-600 py-6 text-lg font-semibold hover:bg-blue-700 shadow-lg shadow-blue-200">
               Add to Cart
             </Button>
 
@@ -224,7 +227,7 @@ const getConditionStyles = (condition: string): string => {
         </div>
         <div className="flex flex-col gap-8 pt-8 lg:flex-row">
           <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
-            <ChatApp />
+            {/* <ChatApp productId={id}/> */}
           </div>
           <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
               <Policy />

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, BadgeCheck } from 'lucide-react';
 import { moneyDhForma } from '@/lib/utils';
 import { Link } from 'react-router-dom';
+import { useCart } from '@/context/CartFavContext';
 
 interface Product {
   _id: string;
@@ -21,6 +22,7 @@ interface ProductCardProps {
 
 const ProductCard = ({ product }: ProductCardProps) => {
   const [isFavorite, setIsFavorite] = useState(false);
+  const {addToCart} = useCart();
 
   const gradeClass =
     product.condition === 'Brand New'
@@ -54,23 +56,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setIsFavorite(!isFavorite);
     window.dispatchEvent(new Event('storage_updated'));
   };
-
-  const addToCart = (e: React.MouseEvent) => {
+  
+  
+  const handleAddToCart  = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-    const existingItem = cart.find((item: any) => item._id === product._id);
-
-    if (existingItem) {
-      existingItem.quantity += 1;
-    } else {
-      cart.push({ ...product, quantity: 1 });
-    }
-
-    localStorage.setItem('cart', JSON.stringify(cart));
-    window.dispatchEvent(new Event('cart_updated'));
+    console.log(product._id)
+    addToCart(product._id)
   };
+
 
   return (
     <Link to={`/${product._id}`} className="group">
@@ -130,14 +124,15 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
 
           {/* Price & Add to cart */}
-          <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
+          <div className="border-t flex-col  xl:flex-row border-gray-100 pt-3 flex items-center justify-between">
             <span className="font-black text-[#60a5fa]">
               {moneyDhForma(product.listingPrice)}
             </span>
 
             <button
-              onClick={addToCart}
-              className="flex items-center gap-2 bg-linear-to-r from-[#3b82f6] to-[#2563eb] text-white px-7 py-2.5 rounded-full font-bold text-sm shadow-lg shadow-blue-200"
+              onClick={handleAddToCart }
+             
+              className="flex my-2 cursor-pointer items-center gap-2 bg-linear-to-r from-[#3b82f6] to-[#2563eb] text-white px-7 py-2.5 rounded-md font-bold text-sm shadow-lg shadow-blue-200"
             >
               <ShoppingCart size={18} />
               <span>Add</span>
