@@ -6,7 +6,7 @@ import { ArrowLeft, CheckCircle2, User } from 'lucide-react';
 import {moneyDhForma} from '@/lib/utils'
 import Policy from '../components/Policy';
 import { useCart } from '@/context/CartFavContext';
-// import ChatApp from '../components/ChatApp';
+import ChatApp from '../components/ChatApp';
 
 
 // 2. Define the Image Interface 
@@ -227,7 +227,7 @@ const getConditionStyles = (condition: string): string => {
         </div>
         <div className="flex flex-col gap-8 pt-8 lg:flex-row">
           <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
-            {/* <ChatApp productId={id}/> */}
+            <ChatApp productId={id}/> 
           </div>
           <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
               <Policy />
