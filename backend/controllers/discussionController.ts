@@ -34,16 +34,22 @@ export const getCreatedDiscussion = asyncHandler(async(req:Request,res:Response)
             buyers:[]
         })
     }
-    const userObjectId = new mongoose.Types.ObjectId(userId)
+    //const userObjectId = new mongoose.Types.ObjectId(userId)
     if(userRole == "Buyer"){
-        if(!discussion.buyers.includes(userObjectId)){
-            discussion.buyers.push(userObjectId)
+        // if(!discussion.buyers.includes(userObjectId)){
+        //     discussion.buyers.push(userObjectId)
+        //     await discussion.save()
+        // }
+        const exist = discussion.buyers.some((id) => id.toString() == userId)
+        if(!exist){
+            discussion.buyers.push(new mongoose.Types.ObjectId(userId))
             await discussion.save()
         }
     }
     if(userRole == "Seller"){
         if(product.seller.toString() !== userId){
             res.status(403).json({message:"not your product "})
+            return
         }
     }
     res.status(200).json({message:"u are in this discussion",discussion})
