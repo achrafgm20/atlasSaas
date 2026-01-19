@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { io, Socket } from "socket.io-client";
+import { UseAuth } from "@/context/AuthContext";
 
 interface Message {
   _id: string;
-  sender: { _id: string; name?: string } | string;
+  sender: { _id: string; name?: string | undefined; role?:string  | undefined } | string;
   content: string;
   createdAt?: string;
 }
@@ -14,6 +15,7 @@ interface ChatAppProps {
 }
 
 const ChatApp = ({ productId }: ChatAppProps) => {
+  const {user} = UseAuth()
   const [comments, setComments] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   const [discussionId, setDiscussionId] = useState<string | null>(null);
@@ -162,7 +164,7 @@ const ChatApp = ({ productId }: ChatAppProps) => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
+    <div className="w-full bg-white rounded-xl shadow-md border border-gray-100 overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b bg-gray-50 flex justify-between items-center">
         <h3 className="text-lg font-bold text-gray-800">
@@ -189,12 +191,14 @@ const ChatApp = ({ productId }: ChatAppProps) => {
                 {typeof c.sender === "object" && c.sender?.name
                   ? c.sender.name.charAt(0).toUpperCase()
                   : "U"}
+                  
               </div>
 
               <div className="flex-1">
                 <div className="flex justify-between mb-1">
-                  <h4 className="text-sm font-semibold text-gray-900">
+                  <h4 className="text-sm font-semibold  text-gray-900">
                     {typeof c.sender === "object" ? c.sender?.name || "User" : "User"}
+                    <span className="pl-2 text-xs text-gray-400 font-normal">{c.sender?.role}</span>
                   </h4>
                   <span className="text-xs text-gray-400">
                     {c.createdAt 
@@ -205,7 +209,7 @@ const ChatApp = ({ productId }: ChatAppProps) => {
                       : ""}
                   </span>
                 </div>
-                <div className="bg-white p-3 rounded-2xl border shadow-sm">
+                <div className={c.sender?.name == user.name ?"bg-blue-200 p-3 rounded-2xl border shadow-sm" :"bg-white p-3 rounded-2xl border shadow-sm"}>
                   <p className="text-sm text-gray-700">{c.content}</p>
                 </div>
               </div>

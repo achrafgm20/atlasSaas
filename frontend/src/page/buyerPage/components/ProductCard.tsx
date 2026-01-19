@@ -56,7 +56,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
     setIsFavorite(!isFavorite);
     window.dispatchEvent(new Event('storage_updated'));
   };
-  
+  const handleFavorite = (e: React.MouseEvent) =>{
+    e.preventDefault();
+    e.stopPropagation();
+    
+  }
   
   const handleAddToCart  = (e: React.MouseEvent) => {
     e.preventDefault();
