@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+
 import { ShoppingCart, Heart, BadgeCheck } from 'lucide-react';
 import { moneyDhForma } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useCart } from '@/context/CartFavContext';
+import { useFavorite } from '@/context/FavoriteContext';
 
 interface Product {
   _id: string;
@@ -21,8 +22,8 @@ interface ProductCardProps {
 }
 
 const ProductCard = ({ product }: ProductCardProps) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-  const {addToCart} = useCart();
+  const { addToCart } = useCart();
+  const { addToFavorites, deleteFromFavorites, isFavorite } = useFavorite();
 
   const gradeClass =
     product.condition === 'Brand New'
@@ -35,40 +36,25 @@ const ProductCard = ({ product }: ProductCardProps) => {
       ? 'bg-gray-500 text-white'
       : 'bg-gray-200 text-black';
 
-  useEffect(() => {
-    const favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-    setIsFavorite(favorites.some((fav: Product) => fav._id === product._id));
-  }, [product._id]);
+  const isProductFavorite = isFavorite(product._id);
 
-  const toggleFavorite = (e: React.MouseEvent) => {
+  const toggleFavorite = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-
-    if (isFavorite) {
-      favorites = favorites.filter((fav: Product) => fav._id !== product._id);
+    if (isProductFavorite) {
+      await deleteFromFavorites(product._id);
     } else {
-      favorites.push(product);
+      await addToFavorites(product._id);
     }
-
-    localStorage.setItem('favorites', JSON.stringify(favorites));
-    setIsFavorite(!isFavorite);
-    window.dispatchEvent(new Event('storage_updated'));
-  };
-  const handleFavorite = (e: React.MouseEvent) =>{
-    e.preventDefault();
-    e.stopPropagation();
-    
-  }
-  
-  const handleAddToCart  = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    console.log(product._id)
-    addToCart(product._id)
   };
 
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    console.log(product._id);
+    addToCart(product._id);
+  };
 
   return (
     <Link to={`/${product._id}`} className="group">
@@ -85,10 +71,10 @@ const ProductCard = ({ product }: ProductCardProps) => {
           <button
             onClick={toggleFavorite}
             className={`absolute top-3 right-3 p-2 rounded-full shadow-md transition ${
-              isFavorite ? 'bg-red-500 text-white' : 'bg-white/80 text-gray-400'
+              isProductFavorite ? 'bg-red-500 text-white' : 'bg-white/80 text-gray-400'
             }`}
           >
-            <Heart size={18} className={isFavorite ? 'fill-current' : ''} />
+            <Heart size={18} className={isProductFavorite ? 'fill-current' : ''} />
           </button>
 
           {/* Condition */}
@@ -128,14 +114,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
 
           {/* Price & Add to cart */}
-          <div className="border-t flex-col  xl:flex-row border-gray-100 pt-3 flex items-center justify-between">
+          <div className="border-t flex-col xl:flex-row border-gray-100 pt-3 flex items-center justify-between">
             <span className="font-black text-[#60a5fa]">
               {moneyDhForma(product.listingPrice)}
             </span>
 
             <button
-              onClick={handleAddToCart }
-             
+              onClick={handleAddToCart}
               className="flex my-2 cursor-pointer items-center gap-2 bg-linear-to-r from-[#3b82f6] to-[#2563eb] text-white px-7 py-2.5 rounded-md font-bold text-sm shadow-lg shadow-blue-200"
             >
               <ShoppingCart size={18} />

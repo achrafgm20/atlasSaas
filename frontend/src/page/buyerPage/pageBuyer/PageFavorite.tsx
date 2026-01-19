@@ -1,22 +1,11 @@
-import React, { useState, useEffect } from 'react';
 import { ChevronLeft, Heart } from 'lucide-react';
 import Favorites from "../components/Favorites";
 import { useNavigate } from 'react-router-dom';
+import { useFavorite } from '@/context/FavoriteContext';
 
 const PageFavorite = () => {
-  const [CountFav, setCountFav] = useState(0);
   const navigate = useNavigate();
-
-  const updateCount = () => {
-    const data = JSON.parse(localStorage.getItem('favorites') || '[]');
-    setCountFav(data.length);
-  };
-
-  useEffect(() => {
-    updateCount();
-    window.addEventListener('storage_updated', updateCount);
-    return () => window.removeEventListener('storage_updated', updateCount);
-  }, []);
+  const { getFavoriteCount } = useFavorite();
 
   return (
     <div className="min-h-screen bg-[#f8fafc] p-4 md:p-10">
@@ -34,7 +23,7 @@ const PageFavorite = () => {
             <Heart className="text-red-500 fill-red-500" size={32} />
             <h1 className="text-3xl font-black text-[#1E3A8A]">My Favorites</h1>
           </div>
-          <p className="text-gray-500">{CountFav} items saved</p>
+          <p className="text-gray-500">{getFavoriteCount()} items saved</p>
         </div>
 
         <Favorites />

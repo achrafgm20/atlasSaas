@@ -1,31 +1,26 @@
 import { useNavigate, NavLink } from "react-router-dom";
 import logo from '../assets/logoAtlas.png';
 import { Box, Heart, ShoppingCart } from 'lucide-react';
-import {  useEffect, useState } from "react";
 import { UseAuth } from '@/context/AuthContext'
 import UserIdNav from "./UserIdNav";
+import { useFavorite } from "@/context/FavoriteContext";
+
+import { useCart } from "@/context/CartFavContext";
+
+
 function NavBar() {
   const navigate = useNavigate();
-  const [favCount, setFavCount] = useState(0);
+  
   const { user,logout } = UseAuth()
-
-  const updateCount = () => {
-    const data = JSON.parse(localStorage.getItem('favorites') || '[]');
-    setFavCount(data.length);
-  };
-
-  useEffect(() => {
-    updateCount();
-    window.addEventListener('storage_updated', updateCount);
-    return () => window.removeEventListener('storage_updated', updateCount);
-  }, []);
+  const {getFavoriteCount} = useFavorite()
+   const{getCartItemCount} =useCart()
 
   const navbar = [
     { id: 1, title: 'All Products', link: "/", icon: Box },
     { id: 2, title: 'Favorites', link: "/Favorites", icon: Heart },
     { id: 3, title: 'Cart', link: "/Cart", icon: ShoppingCart }
   ]
-console.log(user)
+  
   return (
     <div className="w-auto">
       <nav className="w-auto h-20 text-black flex justify-around shadow-md items-center mx-auto p-2">
@@ -50,12 +45,19 @@ console.log(user)
                   <Icon size={20} /> 
                   {nav.title}
                   
-                  {nav.title === 'Favorites' && favCount > 0 && (
+                    {nav.title === 'Favorites' && getFavoriteCount() > 0 && (
                     
                      <span className="bg-red-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold">
-                            {favCount}
+                            {getFavoriteCount()}
             </span>
-                  )}
+                  )} 
+                  {nav.title === 'Cart' && getCartItemCount() > 0 && (
+                <span className="bg-blue-500 text-white text-[10px] rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                            {getCartItemCount()}
+                </span>
+
+            )} 
+                  
                 </NavLink>
               )
             })}
