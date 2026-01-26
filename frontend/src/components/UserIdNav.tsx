@@ -9,11 +9,11 @@ export default function UserIdNav({user  , logout}) {
             {user.role === 'Seller' ? (
                 <Link to='/dashboard' className='flex gap-2 rounded-full p-2 hover:bg-gray-200 cursor-pointer justify-center items-center ' >
                     <Store /> 
-                    {user.name} 
+                  {user.name} 
                     <BadgeCheck size={20} className='text-blue-600' />
                 </Link>)
             : (
-                <div className='flex gap-2 rounded-full p-2 hover:bg-gray-200 cursor-pointer' >
+                <div className='flex  gap-2 rounded-full p-2 hover:bg-gray-200 cursor-pointer' >
                     <User />
                     {user.name} 
                 </div>)}

@@ -1,4 +1,4 @@
-import { Eye, Laptop, Pencil, Smartphone, Trash } from 'lucide-react'
+import { Eye, Laptop, Pencil, Smartphone, Trash , BatteryCharging} from 'lucide-react'
 import { useState } from 'react'
 import {
   AlertDialog,
@@ -86,6 +86,12 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
     navigate('/dashboard/seller')
   }
   
+const handEdite = async () => {
+  console.log("Edit product");
+}
+
+
+
   return (
     <>
       <div className="flex flex-col justify-between  p-2 shadow-md bg-white hover:shadow-xl rounded-xl">
@@ -112,7 +118,7 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
             <ProductCategory category={product.category} />
             <p>{product.storage}</p>
             <p className="capitalize">{product.color}</p>
-            <p>{product.battery}</p>
+            <p className='flex gap-1'>{product.battery}<BatteryCharging /></p>
           </div>
           
           {/* Price Section */}
@@ -132,6 +138,7 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
               <span className='hidden xl:inline text-sm'>View</span>
             </button>
             <button 
+              onClick={() => handEdite()}
               className='flex-1 flex items-center justify-center gap-2 bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200'
               aria-label="Edit product"
             >

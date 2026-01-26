@@ -17,6 +17,8 @@ import PageFavorite from './page/buyerPage/pageBuyer/PageFavorite';
 import ErrorPage from './page/buyerPage/components/ErrorPage';
 import ProductPageBuyer from './page/buyerPage/pageBuyer/ProductPageBuyer';
 import ProductPageSeller from './page/dashboards/components/ProductPageSeller';
+import PageOrder from './page/buyerPage/pageBuyer/PageOrder';
+
 
 
 function App() {
@@ -24,14 +26,16 @@ function App() {
 
   return (
     <>
-    <AuthProvider>
+    
     <BrowserRouter>
+    <AuthProvider>
     <Routes>
       {/* Buyer Routess */}
       <Route element={<MainLayout />}>
         <Route path='/' element={<Home />} />
         <Route path='/:id' element={<ProductPageBuyer />} />
         <Route path='/Cart' element={<PageCart />} />
+        <Route path='/Order' element={<PageOrder />} />
         <Route path='/Favorites' element={<PageFavorite />} />
         <Route path='/regiter' element={<FormCreate />} />
         <Route path='/login' element={<LoginPage />} />
@@ -51,8 +55,9 @@ function App() {
       {/* Error page */}
       <Route path="*" element={<ErrorPage />} />
       </Routes>
+      </AuthProvider>
     </BrowserRouter>
-    </AuthProvider>
+    
       
     </>
   )
