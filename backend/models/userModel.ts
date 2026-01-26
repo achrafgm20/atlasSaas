@@ -4,7 +4,8 @@ export interface IUser extends Document {
     email:string
     password:string
     role:"Seller"|"Buyer"|"admin"
-    statutCompte:Boolean
+    statutCompte:Boolean,
+    stripeAccountId?: string;
 }
 
 const userSchema =new  Schema<IUser>(
@@ -32,7 +33,8 @@ const userSchema =new  Schema<IUser>(
         statutCompte : {
             type:Boolean,
             default: false
-        }
+        },
+        stripeAccountId: { type: String, required: false },
     },
     {
         timestamps : true 
