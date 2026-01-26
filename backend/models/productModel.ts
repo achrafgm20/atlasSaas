@@ -31,7 +31,7 @@ const ProductSchema = new Schema<IProduct> (
         description:{type:String},
         images:{type:[{url:{type:String,required:true},public_id:{type:String,required:true}}],default:[]},
         listingPrice:{type:Number,required:true,min:0},
-        status:{type:String,enum:["Active","Draft"],default:"Active"},
+        status:{type:String,enum:["Active","Draft","Sold"],default:"Active"},
         storage:{type:String,enum:["64GB","128GB","256GB","512GB","1TB"]},
         seller:{type:Schema.Types.ObjectId,ref:"User",required:true,index:true},
     },

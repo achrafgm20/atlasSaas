@@ -19,7 +19,6 @@ export const addFavorite = asyncHandler(async(req:Request,res:Response)=> {
         let favorite = await Favorite.findOne({user:clientId}).populate("products.product", "listingPrice productName images");
         if (!favorite) {
             favorite = new Favorite({user:clientId,products:[]})
-         
         }
         const existingProduct = favorite.products.find(
             (p) => (p.product as any)._id.toString() === productId

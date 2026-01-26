@@ -4,6 +4,7 @@ import User from "../models/userModel";
 import Product from "../models/productModel"
 import cloudinary from "../config/cloudinary";
 import { UploadApiResponse } from "cloudinary";
+import mongoose from "mongoose";
 export const addProduct = asyncHandler(async(req:Request,res:Response)=> {
     const {productName,battery,category,color,condition,costPrice,description,listingPrice,status,storage} = req.body
     if(!productName || !category || !condition || !costPrice || !listingPrice){
@@ -240,7 +241,7 @@ export const editProduct = asyncHandler(async(req:Request,res:Response) => {
         const sellerId = req.user as string 
         const sellerExist = await User.findById(sellerId)
         if(!sellerExist || sellerExist.role !== "Seller"){
-            res.status(403).json({message:"Only sellers can create product"})
+            res.status(403).json({message:"Only seller with this product can edit this product"})
             return 
         }
         if (productName) product.productName = productName;
@@ -253,24 +254,6 @@ export const editProduct = asyncHandler(async(req:Request,res:Response) => {
         if (listingPrice) product.listingPrice = listingPrice;
         if (status) product.status = status;
         if (storage) product.storage = storage;
-        const files = req.files as Express.Multer.File[]
-        if(files && files.length > 0){
-            for(let i = 0 ; i < files.length ; i++){
-                try{
-                    const result:UploadApiResponse = await new Promise((resolve,reject) => {
-                        const stream = cloudinary.uploader.upload_stream({folde:"product"},(error,result) => {
-                            if(error) reject(error)
-                                else resolve(result!)
-                        })
-                        stream.end(files[i].buffer)
-                    })
-                    product.images.push({url:result.secure_url,public_id:result.public_id})
-                }catch(err){
-                    console.error("failed uploading image",err);
-                }
-            }
-        }
-
         await product.save()
         res.status(200).json({product,message:"product edit successfully"})
     }catch(err:any){
@@ -281,7 +264,50 @@ export const editProduct = asyncHandler(async(req:Request,res:Response) => {
 })
 
 
+export const replaceImage = asyncHandler(async(req:Request,res:Response) => {
+    try{
+        const {productId,imageId} = req.params
+        const file = req.file as Express.Multer.File
+        const product = await Product.findById(productId)
+        if(!product){
+            res.status(404).json({message:"Product is not foundd"})
+            return
+        }
+        const sellerId = req.user as string 
+        const sellerExist = await User.findById(sellerId)
+        if(!sellerExist || sellerExist.role !== "Seller"){
+            res.status(403).json({message:"Only seller with this product can edit image of this product"})
+            return 
+        }
+        const imageIndex = product.images.findIndex((img:any)=>  img._id.toString() === imageId)
+        
+        if(imageIndex === -1){
+            res.status(404).json({message:"Image not foundd"})
+            return
+        }
+        //delete image
+        await cloudinary.uploader.destroy(product.images[imageIndex].public_id)
+        //uplaod new Image
+        const uploadResult:UploadApiResponse = await new Promise((resolve,reject) => {
+            const stream = cloudinary.uploader.upload_stream({folder:"products"},(err,resulat) => {
+                if(err) reject(err)
+                else resolve(resulat!)
+            })
+            stream.end(file.buffer)
+        })
+        //replace image in arr 
+        product.images[imageIndex] = {
+            url:uploadResult.secure_url,
+            public_id:uploadResult.public_id
+        }
+        await product.save()
+        res.status(200).json({message:"image replaced successfuly",product})
 
+    } catch(err){
+        res.status(404).json({message:"error while editing image api ",err})
+        
+    }
+}) 
 
 export const detailsProduct = asyncHandler(async(req:Request,res:Response) => {
     try {

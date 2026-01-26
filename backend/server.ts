@@ -15,6 +15,7 @@ import discussionRoute from "./routes/discussionRoute";
 import Message from "./models/message";
 import { createServer } from "http";
 import {Server,Socket} from "socket.io"
+import { CheckoutRouter, webhookRouter } from './routes/checkoutRoutes';
 
 
 
@@ -35,6 +36,7 @@ app.use(cors({
 //   console.log("📁 uploads folder created");
 // }
 
+app.use("/api/checkout/webhook",express.raw({type:"application/json"}),webhookRouter)
 
 app.use(express.json())
 app.use("/api/users",router)
@@ -42,7 +44,7 @@ app.use("/api/product",ProductRouter)
 app.use("/api/cart",CartRouter)
 app.use("/api/favorite",FavoriteRouter)
 app.use("/api/discussion",discussionRoute)
-
+app.use("/api/checkout",CheckoutRouter)
 //this for uplaod images 
 // app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
