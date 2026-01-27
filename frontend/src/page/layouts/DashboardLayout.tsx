@@ -6,6 +6,7 @@ import { User } from 'lucide-react';
 
 export default function DashboardLayout() {
   const { user } = UseAuth();
+  console.log(user)
   return (
     <>
         <section className="flex min-h-screen bg-[#1E3A8A]">
