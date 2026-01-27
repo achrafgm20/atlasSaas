@@ -27,7 +27,8 @@ export const registerUser = asyncHandler(async (req:Request,res:Response) => {
         return
     }
     if(role === "Seller"){
-        const stripeAccount = await stripe.accounts.create({
+        try{
+            const stripeAccount = await stripe.accounts.create({
             type:"express",
             country:"US",
             email:user.email,
@@ -37,8 +38,9 @@ export const registerUser = asyncHandler(async (req:Request,res:Response) => {
     },
     business_type: 'individual'
         })
+       
         user.stripeAccountId = stripeAccount.id
-        await user.save()
+        
 
         const accountLink = await stripe.accountLinks.create({
             account:stripeAccount.id,
@@ -46,18 +48,33 @@ export const registerUser = asyncHandler(async (req:Request,res:Response) => {
             return_url: `${process.env.CLIENT_URL}/seller/onboarding/success`,
             type: "account_onboarding",
         })
-          res.status(201).json({
+        user.stripeAccountId = stripeAccount.id;
+        user.stripeOnboardingUrl = accountLink.url;
+        user.stripeOnboardingCompleted = false;
+        user.canReceiveTransfers = false;
+        user.transfersCapability = "inactive";
+        await user.save();
+        res.status(201).json({
             _id: user._id,
             name: user.name,
             email: user.email,
             role: user.role,
             statutCompte: user.statutCompte,
             token: generateToken(user._id?.toString() as string),
-            stripeOnboardingUrl: accountLink.url
+            stripeAccountId: user.stripeAccountId,
+            stripeOnboardingUrl: user.stripeOnboardingUrl,
+            stripeOnboardingCompleted: user.stripeOnboardingCompleted,
+            canReceiveTransfers: user.canReceiveTransfers,
+            transfersCapability: user.transfersCapability
+        })
+        return
+        }catch(err:any){
+            console.error("error creating stripe account ",err);
             
-
-    })
-    return
+        }
+        return 
+        
+    
     
     }
 
@@ -133,7 +150,12 @@ export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Respo
         
         for(let seller of sellers) {
             const account = await stripe.accounts.retrieve(seller.stripeAccountId!);
-            
+            seller.stripeDetailsSubmitted = account.details_submitted;
+            seller.stripeOnboardingCompleted = account.details_submitted;
+            seller.canReceiveTransfers = account.capabilities?.transfers === 'active' && account.details_submitted;
+            seller.transfersCapability = account.capabilities?.transfers || "inactive";
+            seller.lastStripeSync = new Date();
+            await seller.save();
             statuses.push({
                 sellerEmail: seller.email,
                 accountId: seller.stripeAccountId,
