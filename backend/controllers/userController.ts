@@ -151,12 +151,22 @@ export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Respo
         
         for(let seller of sellers) {
             const account = await stripe.accounts.retrieve(seller.stripeAccountId!);
-            seller.stripeDetailsSubmitted = account.details_submitted;
-            seller.stripeOnboardingCompleted = account.details_submitted;
-            seller.canReceiveTransfers = account.capabilities?.transfers === 'active' && account.details_submitted;
-            seller.transfersCapability = account.capabilities?.transfers || "inactive";
-            seller.lastStripeSync = new Date();
-            await seller.save();
+            
+            // Update using findByIdAndUpdate to ensure it saves
+            await User.findByIdAndUpdate(
+                seller._id,
+                {
+                    $set: {
+                        stripeDetailsSubmitted: account.details_submitted,
+                        stripeOnboardingCompleted: account.details_submitted,
+                        canReceiveTransfers: account.capabilities?.transfers === 'active' && account.details_submitted,
+                        transfersCapability: account.capabilities?.transfers || "inactive",
+                        lastStripeSync: new Date()
+                    }
+                },
+                { new: true }
+            );
+            
             statuses.push({
                 sellerEmail: seller.email,
                 accountId: seller.stripeAccountId,
@@ -172,7 +182,6 @@ export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Respo
         res.status(500).json({ error: err.message });
     }
 });
-
 
 
 export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Response) => {
