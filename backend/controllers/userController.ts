@@ -42,12 +42,12 @@ export const registerUser = asyncHandler(async (req:Request,res:Response) => {
         user.stripeAccountId = stripeAccount.id
         
 
-        const accountLink = await stripe.accountLinks.create({
-            account:stripeAccount.id,
-            refresh_url:`${process.env.CLIENT_URL}/seller/onboarding/refresh`,
-            return_url: `${process.env.CLIENT_URL}/seller/onboarding/success`,
-            type: "account_onboarding",
-        })
+       const accountLink = await stripe.accountLinks.create({
+    account: stripeAccount.id,
+    refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${user._id}`, // ✅ Add userId
+    return_url: `${process.env.CLIENT_URL}/seller/onboarding/success`,
+    type: "account_onboarding",
+})
         user.stripeAccountId = stripeAccount.id;
         user.stripeOnboardingUrl = accountLink.url;
         user.stripeOnboardingCompleted = false;
@@ -131,6 +131,7 @@ export const getMe = asyncHandler(async (req:Request,res:Response) => {
             res.status(404).json({message:"user not found"})
             return
         }
+        console.log(user)
         res.status(200).json(user)
 })
 
@@ -171,3 +172,32 @@ export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Respo
         res.status(500).json({ error: err.message });
     }
 });
+
+
+
+export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Response) => {
+    const userId = req.query.userId as string; // ✅ Get from query params, not req.user
+    
+    if (!userId) {
+        res.status(400).json({ message: "User ID missing" });
+        return;
+    }
+
+    const user = await User.findById(userId);
+    
+    if (!user?.stripeAccountId) {
+        res.status(404).json({ message: "Stripe account not found" });
+        return;
+    }
+
+    const accountLink = await stripe.accountLinks.create({
+        account: user.stripeAccountId,
+        refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${userId}`, // ✅ Pass userId again
+        return_url: `${process.env.CLIENT_URL}/seller/onboarding/success`,
+        type: "account_onboarding",
+    });
+
+    // Redirect directly to the new onboarding URL
+    res.redirect(accountLink.url);
+});
+
