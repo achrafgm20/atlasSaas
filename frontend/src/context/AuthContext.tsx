@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
-import { useNavigate } from 'react-router-dom';
+
 
 
 interface User {
@@ -7,6 +7,12 @@ interface User {
   name: string;
   email: string;
   role: string;
+  
+   statutCompte?: boolean;
+  stripeOnboardingUrl?: string;
+  stripeAccountId?: string;
+  stripeOnboardingCompleted?: boolean;
+  canReceiveTransfers?: boolean;
 }
 
 interface AuthContextType {
@@ -20,7 +26,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-   const navigate = useNavigate();
+
   
   // Initialize user state from localStorage
   const [user, setUser] = useState<User | null>(() => {

@@ -1,12 +1,16 @@
-
-import { UseAuth } from '@/context/AuthContext';
+// import {useEffect} from 'react';
+ import { UseAuth } from '@/context/AuthContext';
 import Sidebar from '../dashboards/components/Sidebar'
 import { Outlet } from 'react-router-dom'
 import { User } from 'lucide-react';
 
 export default function DashboardLayout() {
-  const { user } = UseAuth();
-  console.log(user)
+  const {user } = UseAuth();
+//   const { fetchUser,user } = UseAuth();
+//  useEffect(() => {
+//   fetchUser();
+// }, []);
+// console.log(user)
   return (
     <>
         <section className="flex min-h-screen bg-[#1E3A8A]">

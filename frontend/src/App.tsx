@@ -18,6 +18,7 @@ import ErrorPage from './page/buyerPage/components/ErrorPage';
 import ProductPageBuyer from './page/buyerPage/pageBuyer/ProductPageBuyer';
 import ProductPageSeller from './page/dashboards/components/ProductPageSeller';
 import PageOrder from './page/buyerPage/pageBuyer/PageOrder';
+import Settings from './page/dashboards/home/Settings';
 
 
 
@@ -50,6 +51,7 @@ function App() {
           <Route path='/dashboard/Orders' element={<Orders />} />
           <Route path='/dashboard/Messages' element={<Messages />} />
           <Route path='/dashboard/sales' element={<SalesOverview />} />
+          <Route path='/dashboard/settings' element={<Settings />} />
         </Route>
       </Route>
       {/* Error page */}
