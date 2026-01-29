@@ -1,5 +1,12 @@
 import mongoose, { Document, Schema } from "mongoose";
-
+export interface IAddress {
+    city?: string;
+    country?: string;
+    line1?: string;
+    line2?: string;
+    postal_code?: string;
+    state?: string;
+}
 export interface IOrderItem {
     productId:mongoose.Types.ObjectId,
     productName:string,
@@ -14,6 +21,9 @@ export interface IOrder extends Document{
     totalAmount:number,
     stripeSessionId:string,
     status:"pending" | "paid" | "failed"
+    shippingAddress?: IAddress;
+    billingAddress?: IAddress;
+    customerEmail?: string;
 }
 const orderItemSchema = new Schema<IOrderItem>({
     productId:{type:Schema.Types.ObjectId,ref:"Product",required:true},
@@ -32,7 +42,23 @@ const orderSchema = new Schema<IOrder>({
     totalAmount:{type:Number,required:true},
     stripeSessionId:{type:String,required:true},
     status:{type:String,enum:["pending","paid","failed"],default:"pending"},
-
+     shippingAddress: {
+        city: String,
+        country: String,
+        line1: String,
+        line2: String,
+        postal_code: String,
+        state: String
+    },
+    billingAddress: {
+        city: String,
+        country: String,
+        line1: String,
+        line2: String,
+        postal_code: String,
+        state: String
+    },
+    customerEmail: String
 
 
 },
