@@ -7,6 +7,7 @@ import { moneyDhForma } from '@/lib/utils';
 const Cart = () => {
   const { cart, total, loading, deleteFromCart, clearCart, getCartItemCount } = useCart();
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   const handleRemoveItem = async (productId) => {
     await deleteFromCart(productId);
@@ -60,6 +61,31 @@ const Cart = () => {
   const subtotal = total || 0;
 
   const totalAmount = subtotal ;
+
+  const handleCheckout = async () => {
+  try {
+    
+
+    const response = await fetch(
+      "http://localhost:4000/api/checkout/createSession",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    const data = await response.json();
+
+    window.location.href = data.url;
+    console.log(data)
+
+  } catch (error) {
+    console.error("Checkout error:", error);
+  }
+};
 
   return (
     <div className="max-w-6xl h-auto mx-auto p-6">
@@ -141,6 +167,7 @@ const Cart = () => {
             </div>
             
             <button 
+              onClick={handleCheckout}
               className="w-full cursor-pointer bg-[#1E3A8A] text-white py-4 rounded-2xl font-bold hover:bg-blue-900 transition-all shadow-lg shadow-blue-100"
               disabled={loading}
             >

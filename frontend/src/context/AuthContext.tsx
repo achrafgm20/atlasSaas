@@ -1,11 +1,21 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 
 
+
 interface User {
   id: string;
   name: string;
   email: string;
   role: string;
+  
+   statutCompte?: boolean;
+  stripeOnboardingUrl?: string;
+  stripeAccountId?: string;
+  stripeOnboardingCompleted?: boolean;
+  canReceiveTransfers?: boolean;
+  onboardingComplete?: boolean;
+  transfersActive?: boolean;
+  canReceiveMoney?: boolean
 }
 
 interface AuthContextType {
@@ -19,6 +29,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
+
   
   // Initialize user state from localStorage
   const [user, setUser] = useState<User | null>(() => {
@@ -53,8 +64,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('user');
-    localStorage.removeItem('token');
+    localStorage.clear();
+    window.location.reload();
   };
 
   const fetchUser = async () => {

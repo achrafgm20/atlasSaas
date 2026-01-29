@@ -67,7 +67,7 @@ export const getMessage = asyncHandler(async(req:Request,res:Response) => {
     const messages = await Message.find({
         discussion: req.params.discussionId
     })
-    .populate("sender", "name _id") // Add _id to populated fields
+    .populate("sender", "name role _id") // Add _id to populated fields
     .sort({ createdAt: 1 }); // Sort by creation time
     
     res.json(messages);

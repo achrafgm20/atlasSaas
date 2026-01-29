@@ -150,6 +150,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+
   // Clear cart
   const clearCart = async () => {
     setLoading(true);

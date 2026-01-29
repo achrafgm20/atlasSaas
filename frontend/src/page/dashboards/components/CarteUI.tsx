@@ -1,4 +1,4 @@
-import { Eye, Laptop, Pencil, Smartphone, Trash } from 'lucide-react'
+import { Eye, Laptop, Pencil, Smartphone, Trash , BatteryCharging} from 'lucide-react'
 import { useState } from 'react'
 import {
   AlertDialog,
@@ -86,6 +86,12 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
     navigate('/dashboard/seller')
   }
   
+const handEdite = async () => {
+  console.log("Edit product");
+}
+
+
+
   return (
     <>
       <div className="flex flex-col justify-between  p-2 shadow-md bg-white hover:shadow-xl rounded-xl">
@@ -112,7 +118,7 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
             <ProductCategory category={product.category} />
             <p>{product.storage}</p>
             <p className="capitalize">{product.color}</p>
-            <p>{product.battery}</p>
+            <p className='flex gap-1'>{product.battery}<BatteryCharging /></p>
           </div>
           
           {/* Price Section */}
@@ -124,14 +130,15 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
           {/* Action Buttons */}
           <div className='flex gap-2 pt-2'>
             <button 
-              onClick={()=> navigate(`/dashboard/products/${product._id}`)}
-              className='flex-1 flex items-center justify-center gap-2 bg-blue-50 text-blue-600 px-4 py-2.5 rounded-xl hover:bg-blue-100 transition-colors duration-200'
+              onClick={()=> navigate(`/dashboard/ProductPageSeller/${product._id}`)}
+              className='flex-1 flex items-center justify-center gap-2 bg-blue-50 cursor-pointer text-blue-600 px-4 py-2.5 rounded-xl hover:bg-blue-100 transition-colors duration-200'
               aria-label="View product"
             >
               <Eye size={18} />
               <span className='hidden xl:inline text-sm'>View</span>
             </button>
             <button 
+              onClick={() => handEdite()}
               className='flex-1 flex items-center justify-center gap-2 bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200'
               aria-label="Edit product"
             >
