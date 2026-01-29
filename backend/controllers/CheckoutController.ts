@@ -80,6 +80,10 @@ export const createCheckoutSession = asyncHandler(async(req:Request,res:Response
             //         destination:sellerStripeAccountId
             //     }
             // },
+             shipping_address_collection: {
+                allowed_countries: ['US', 'CA', 'GB', 'FR', 'MA', 'DE', 'IT', 'ES']
+            },
+            billing_address_collection: "required",
             payment_intent_data: {
                 transfer_group: `ORDER_${clientId}_${Date.now()}`, // unique per order
             },
@@ -128,9 +132,27 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
          return
     }
     if(event.type === "checkout.session.completed"){
-        const session = event.data.object as Stripe.Checkout.Session
+        // const session = event.data.object as Stripe.Checkout.Session
+        const sessionFromEvent = event.data.object as Stripe.Checkout.Session
+        
+        // Retrieve full session with shipping/billing details
+        const sessionData = await stripe.checkout.sessions.retrieve(
+            sessionFromEvent.id,
+            {
+                expand: ['customer_details', 'shipping_details']
+            }
+        );
+        
+        const shippingAddress = (sessionData as any).shipping_details?.address || null;
+        const billingAddress = (sessionData as any).customer_details?.address || null;
+        const customerEmail = (sessionData as any).customer_details?.email || null;
          // find order. y stripe session id 
-         const order = await Order.findOne({stripeSessionId:session.id})
+         const order = await Order.findOneAndUpdate({stripeSessionId:sessionData.id},
+            {
+                shippingAddress,billingAddress,customerEmail,status:"paid"
+            },
+            {new:true}
+         )
          if(!order){
              res.status(400).json({message:"order not found"})
              return
@@ -144,7 +166,7 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
                     amount:sellerAmount,
                     currency:"usd",
                     destination:item.stripeAccountId,
-                    transfer_group:session.payment_intent as string
+                    transfer_group:sessionData.payment_intent as string
                 })
             }
             //update status of products to sold 
@@ -161,12 +183,12 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
                 await cart.save()
             }
             //update order stats
-            const updatedOrder = await Order.findByIdAndUpdate(
-                order._id,
-                {$set:{status:"paid"}},
-                {new:true}
-            )
-            console.log(`order changeed status to ${updatedOrder?.status}`)
+            // const updatedOrder = await Order.findByIdAndUpdate(
+            //     order._id,
+            //     {$set:{status:"paid"}},
+            //     {new:true}
+            // )
+            // console.log(`order changeed status to ${updatedOrder?.status}`)
             res.status(200).json({message:"Payment processed successfully"})
             return 
 
