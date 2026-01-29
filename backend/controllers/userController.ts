@@ -45,7 +45,7 @@ export const registerUser = asyncHandler(async (req:Request,res:Response) => {
        const accountLink = await stripe.accountLinks.create({
     account: stripeAccount.id,
     refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${user._id}`, // ✅ Add userId
-    return_url: `${process.env.CLIENT_URL}/seller/onboarding/success`,
+    return_url: `${process.env.CLIENT_URL}/dashboard/settings`,
     type: "account_onboarding",
 })
         user.stripeAccountId = stripeAccount.id;
@@ -185,7 +185,7 @@ export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Respo
 
 
 export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Response) => {
-    const userId = req.query.userId as string; // ✅ Get from query params, not req.user
+    const userId = req.query.userId as string; 
     
     if (!userId) {
         res.status(400).json({ message: "User ID missing" });
@@ -202,7 +202,7 @@ export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Re
     const accountLink = await stripe.accountLinks.create({
         account: user.stripeAccountId,
         refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${userId}`, // ✅ Pass userId again
-        return_url: `${process.env.CLIENT_URL}/seller/onboarding/success`,
+        return_url: `${process.env.CLIENT_URL}/dashboard/settings`,
         type: "account_onboarding",
     });
 

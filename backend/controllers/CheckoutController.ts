@@ -83,8 +83,8 @@ export const createCheckoutSession = asyncHandler(async(req:Request,res:Response
             payment_intent_data: {
                 transfer_group: `ORDER_${clientId}_${Date.now()}`, // unique per order
             },
-            success_url: `${process.env.CLIENT_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.CLIENT_URL}/cancel`, 
+            success_url: `${process.env.CLIENT_URL}/PaymentSuccess`,
+            cancel_url: `${process.env.CLIENT_URL}/PaymentFailed`, 
         })
         await Order.create({
             buyer:clientId,

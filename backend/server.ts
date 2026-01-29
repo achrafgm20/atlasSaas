@@ -16,6 +16,7 @@ import Message from "./models/message";
 import { createServer } from "http";
 import {Server,Socket} from "socket.io"
 import { CheckoutRouter, webhookRouter } from './routes/checkoutRoutes';
+import OrderRouter from './routes/orderRoutes';
 
 
 
@@ -45,6 +46,7 @@ app.use("/api/cart",CartRouter)
 app.use("/api/favorite",FavoriteRouter)
 app.use("/api/discussion",discussionRoute)
 app.use("/api/checkout",CheckoutRouter)
+app.use("/api/orders",OrderRouter)
 //this for uplaod images 
 // app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
