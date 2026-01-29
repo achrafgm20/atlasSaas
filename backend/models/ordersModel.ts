@@ -24,6 +24,8 @@ export interface IOrder extends Document{
     shippingAddress?: IAddress;
     billingAddress?: IAddress;
     customerEmail?: string;
+    stripePayementIntentIdf:string,
+    stripeChargeId:string
 }
 const orderItemSchema = new Schema<IOrderItem>({
     productId:{type:Schema.Types.ObjectId,ref:"Product",required:true},
@@ -48,7 +50,6 @@ const orderSchema = new Schema<IOrder>({
         line1: String,
         line2: String,
         postal_code: String,
-        state: String
     },
     billingAddress: {
         city: String,
@@ -56,9 +57,10 @@ const orderSchema = new Schema<IOrder>({
         line1: String,
         line2: String,
         postal_code: String,
-        state: String
     },
-    customerEmail: String
+    customerEmail: String,
+    stripePayementIntentIdf:String,
+    stripeChargeId:String
 
 
 },
