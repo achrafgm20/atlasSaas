@@ -6,17 +6,19 @@ import { Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { UseAuth } from "@/context/AuthContext";
 
 interface User {
-  _id: string; // Changed from id to _id
+  id: string;
   name: string;
   email: string;
   role: string;
-  statutCompte?: boolean;
+  
+   statutCompte?: boolean;
   stripeOnboardingUrl?: string;
   stripeAccountId?: string;
   stripeOnboardingCompleted?: boolean;
-  stripeDetailsSubmitted?: boolean;
   canReceiveTransfers?: boolean;
-  transfersCapability?: string;
+  onboardingComplete?: boolean;
+  transfersActive?: boolean;
+  canReceiveMoney?: boolean
 }
 
 // Validation schema

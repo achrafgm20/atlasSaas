@@ -3,6 +3,7 @@
     "multer": "^2.0.2"
   },
   "devDependencies": {
-    "@types/multer": "^2.0.0"
+    "@types/multer": "^2.0.0",
+    "@types/node": "^25.1.0"
   }
 }

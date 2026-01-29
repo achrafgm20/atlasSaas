@@ -31,8 +31,8 @@ function NavBar() {
   const closeMenu = () => setIsMenuOpen(false);
 
   return (
-    <div className="w-full">
-      <nav className="w-full h-20 text-black flex justify-between shadow-md items-center px-4 md:px-8">
+    <div className="w-full sticky top-0 z-50 bg-white shadow-md">
+      <nav className="w-full  h-20 text-black flex justify-between shadow-md items-center px-4 md:px-8">
         {/* Logo */}
         <img 
           src={logo} 

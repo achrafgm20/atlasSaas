@@ -19,7 +19,8 @@ import ProductPageBuyer from './page/buyerPage/pageBuyer/ProductPageBuyer';
 import ProductPageSeller from './page/dashboards/components/ProductPageSeller';
 import PageOrder from './page/buyerPage/pageBuyer/PageOrder';
 import Settings from './page/dashboards/home/Settings';
-
+import PaymentSuccess from './page/buyerPage/components/PaymentSuccess';
+import PaymentFailed from './page/buyerPage/components/PaymentFailed';
 
 
 function App() {
@@ -40,6 +41,9 @@ function App() {
         <Route path='/Favorites' element={<PageFavorite />} />
         <Route path='/regiter' element={<FormCreate />} />
         <Route path='/login' element={<LoginPage />} />
+        <Route path='/PaymentSuccess' element={<PaymentSuccess />} />
+        <Route path='/PaymentFailed' element={<PaymentFailed />} />
+        
       </Route>
 
       {/* Seller Routess */}

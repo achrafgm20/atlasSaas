@@ -89,7 +89,7 @@ const getConditionStyles = (condition: string): string => {
   }
 
   if (!product) return <p className="text-center mt-10">Product not found</p>;
-
+console.log(product)
   return (
     <div className="min-h-screen bg-[#ebedf0] rounded-4xl px-4 py-10">
       <div className="mx-auto flex w-full max-w-7xl flex-col">

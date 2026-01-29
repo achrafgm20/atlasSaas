@@ -13,6 +13,9 @@ interface User {
   stripeAccountId?: string;
   stripeOnboardingCompleted?: boolean;
   canReceiveTransfers?: boolean;
+  onboardingComplete?: boolean;
+  transfersActive?: boolean;
+  canReceiveMoney?: boolean
 }
 
 interface AuthContextType {
