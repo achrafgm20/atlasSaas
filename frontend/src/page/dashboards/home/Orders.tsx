@@ -7,6 +7,12 @@ interface ApiOrder {
   buyer: {
     name: string;
   };
+  billingAddress: {
+    line1: string;
+    city: string;
+    postal_code: string;
+    country: string;
+  };
   items: {
     productId: string;
     productName: string;
@@ -43,7 +49,7 @@ const OrdersTable: React.FC = () => {
     };
 
     fetchOrders();
-  }, []);
+  }, [token]);
 
   if (loading) {
     return (
@@ -52,7 +58,7 @@ const OrdersTable: React.FC = () => {
       </div>
     );
   }
-
+console.log(orders)
   return (
     <div className="min-h-screen bg-gray-50 p-8 rounded-xl">
       <div className="max-w-8xl mx-auto">
@@ -82,6 +88,7 @@ const OrdersTable: React.FC = () => {
                   <tr className="border-b border-gray-200 bg-gray-50">
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Order ID</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Adress</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buyer</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
@@ -102,7 +109,9 @@ const OrdersTable: React.FC = () => {
                           </div>
                         ))}
                       </td>
-
+                        <td className="px-6 py-4 text-sm text-gray-900">
+                        {order.billingAddress?.line1} {order.billingAddress?.city} {order.billingAddress?.postal_code} {order.billingAddress?.country}
+                      </td>
                       <td className="px-6 py-4 text-sm text-gray-900">
                         {order.buyer.name}
                       </td>

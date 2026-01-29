@@ -25,6 +25,13 @@ interface Order {
   stripeAccountId?: string;
   createdAt: string;
   updatedAt: string;
+  billingAddress: {
+    line1: string;
+    line2: string;
+    city: string;
+    postal_code: string;
+    country: string;
+  };  
   __v: number;
 }
 
@@ -196,6 +203,8 @@ function PageOrder() {
                                 <div className="mt-2 text-xs text-gray-500">
                                   <p>Seller: {item.sellerId.name}</p>
                                   <p>{item.sellerId.email}</p>
+
+                                  
                                 </div>
                               )}
                             </div>
@@ -235,9 +244,13 @@ function PageOrder() {
                           </div>
                           
                           <div className="pb-3 border-b">
-                            <p className="text-xs text-gray-500 mb-1">Session ID</p>
+                            <p className="text-xs text-gray-500 mb-1">Adress Billing</p>
                             <p className="text-sm font-mono text-gray-700 break-all">
-                              {order.stripeSessionId}
+                              <p>{order.billingAddress?.city}</p>
+                              <p>{order.billingAddress?.line1}</p>
+                              <p>{order.billingAddress?.line2}</p>
+                              <p>{order.billingAddress?.postal_code}</p>
+                              <p>{order.billingAddress?.country}</p>
                             </p>
                           </div>
                           
