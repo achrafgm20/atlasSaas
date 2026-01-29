@@ -133,23 +133,23 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
     }
     if(event.type === "checkout.session.completed"){
         // const session = event.data.object as Stripe.Checkout.Session
-        const sessionFromEvent = event.data.object as Stripe.Checkout.Session
         
-        // Retrieve full session with shipping/billing details
-        const sessionData = await stripe.checkout.sessions.retrieve(
-            sessionFromEvent.id,
-            {
-                expand: ['customer_details', 'shipping_details']
-            }
-        );
+        const session = event.data.object as Stripe.Checkout.Session;
         
-        const shippingAddress = (sessionData as any).shipping_details?.address || null;
-        const billingAddress = (sessionData as any).customer_details?.address || null;
-        const customerEmail = (sessionData as any).customer_details?.email || null;
+        // Access shipping and billing details directly from the session
+        // No need to retrieve or expand - they're already there!
+        const shippingAddress = (session as any).shipping_details?.address || null;
+        const billingAddress = (session as any).customer_details?.address || null;
+        const customerEmail = (session as any).customer_details?.email || null;
+        console.log("Shipping Address:", shippingAddress);
+        console.log("Billing Address:", billingAddress);
+        console.log("Customer Email:", customerEmail);
+        
+       
          // find order. y stripe session id 
-         const order = await Order.findOneAndUpdate({stripeSessionId:sessionData.id},
+         const order = await Order.findOneAndUpdate({stripeSessionId:session.id},
             {
-                shippingAddress,billingAddress,customerEmail,status:"paid"
+                shippingAddress,billingAddress,customerEmail,status:"paid",stripePayementIntentIdf:session.payment_intent as string
             },
             {new:true}
          )
@@ -166,7 +166,7 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
                     amount:sellerAmount,
                     currency:"usd",
                     destination:item.stripeAccountId,
-                    transfer_group:sessionData.payment_intent as string
+                    transfer_group:session.payment_intent as string
                 })
             }
             //update status of products to sold 
