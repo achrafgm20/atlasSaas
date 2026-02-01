@@ -17,6 +17,9 @@ import { createServer } from "http";
 import {Server,Socket} from "socket.io"
 import { CheckoutRouter, webhookRouter } from './routes/checkoutRoutes';
 import OrderRouter from './routes/orderRoutes';
+import Discussion from './models/discussion';
+import Notifaction from './models/notificationModel';
+import mongoose from 'mongoose';
 
 
 
@@ -67,6 +70,7 @@ const io = new Server(server, {
     credentials: true,
   },
 });
+export {io}
 io.on("connection", async(socket) => {
   try {
     const token = socket.handshake.auth.token
@@ -87,6 +91,10 @@ io.on("connection", async(socket) => {
     socket.join(discussionId);
     console.log(`User with id : ${socket.id} joinde room discussion with id  ${discussionId}`)
   });
+  
+  socket.on("joinUserRoom",(userId:string) => {
+    socket.join(userId)
+  })
 
   // socket.on("sendMessage", async ({ discussionId, content }:{discussionId:string,content:string}) => {
   //   const userId = socket.data.user.id;
@@ -114,6 +122,31 @@ io.on("connection", async(socket) => {
     const populatedMessage = await Message.findById(message._id).populate("sender", "name _id");
 
     io.to(discussionId).emit("receiveMessage", populatedMessage);
+    const discution = await Discussion.findById(discussionId).populate("product","productName")
+    if(!discution) {
+      console.error("discution is not found")
+      return
+    }
+    const sellerId = discution?.seller.toString()
+    const sellerObjectId = discution.seller as mongoose.Types.ObjectId
+    if(!sellerId) {
+      console.error("seller is not found in this discussion ")
+      return 
+    } 
+    await Notifaction.create({
+      user:sellerObjectId ,
+      type:"message" as "message",
+      title:"New Message",
+      body:message.content as string,
+      link:`/seller/discussion/${discussionId}`
+    })
+    io.to(sellerId).emit("notification",{
+      type:"message",
+      title:"New message",
+      body:message.content,
+      discussionId
+    })
+
 });
 
   socket.on("disconnect",() => {
