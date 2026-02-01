@@ -10,15 +10,23 @@ interface User {
   name: string;
   email: string;
   role: string;
+  phone?: string;
+  storeName?: string;
+  storeDescription?: string;
+  Country?: string;
+  city?: string;
+  postalCode?: string;
+  adresse?: string;
   
-   statutCompte?: boolean;
+  statutCompte?: boolean;
   stripeOnboardingUrl?: string;
   stripeAccountId?: string;
   stripeOnboardingCompleted?: boolean;
+  stripeDetailsSubmitted?: boolean;
   canReceiveTransfers?: boolean;
   onboardingComplete?: boolean;
   transfersActive?: boolean;
-  canReceiveMoney?: boolean
+  canReceiveMoney?: boolean;
 }
 
 // Validation schema
@@ -28,10 +36,10 @@ const profileSchema = z.object({
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   storeName: z.string().min(2, "Store name must be at least 2 characters"),
   storeDescription: z.string().optional(),
-  country: z.string().min(2, "Country is required"),
+  Country: z.string().min(2, "Country is required"),
   city: z.string().min(2, "City is required"),
   postalCode: z.string().min(4, "Postal code is required"),
-  street: z.string().min(5, "Street address is required"),
+  adresse: z.string().min(5, "adresse address is required"),
 });
 
 type ProfileFormValues = z.infer<typeof profileSchema>;
@@ -39,19 +47,21 @@ type ProfileFormValues = z.infer<typeof profileSchema>;
 export default function Settings() {
   const { fetchUser, user } = UseAuth();
   const [isLoading, setIsLoading] = useState(true);
+  const [updateSuccess, setUpdateSuccess] = useState(false);
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "John Seller",
-      email: "john.seller@atlastech.com",
-      phone: "+1 (555) 123-4567",
-      storeName: "AtlasTech Electronics",
-      storeDescription: "Premium smartphones and laptops.",
-      country: "United States",
-      city: "San Francisco",
-      postalCode: "94102",
-      street: "123 Commerce Street",
+      fullName: "",
+      email: "",
+      phone: "",
+      storeName: "",
+      storeDescription: "",
+      Country: "",
+      city: "",
+      postalCode: "",
+      adresse: "",
     },
   });
 
@@ -64,17 +74,82 @@ export default function Settings() {
     loadUser();
   }, []);
 
+  // Populate form with user data when it loads
   useEffect(() => {
     if (user) {
       console.log("User data:", user);
       console.log("Stripe URL:", user.stripeOnboardingUrl);
       console.log("Stripe Completed:", user.stripeOnboardingCompleted);
+      
+      // Update form values with actual user data
+      // Adjust these field mappings based on your actual user object structure
+      form.reset({
+        fullName: user.name || "",
+        email: user.email || "",
+        phone: user.phone || "",
+        storeName: user.storeName || "",
+        storeDescription: user.storeDescription || "",
+        Country: user.Country || "",
+        city: user.city || "",
+        postalCode: user.postalCode || "",
+        adresse: user.adresse || "",
+      });
     }
   }, [user]);
 
   const onSubmit = async (data: ProfileFormValues) => {
-    await new Promise((r) => setTimeout(r, 1000));
-    console.log("Profile updated:", data);
+    setUpdateSuccess(false);
+    setUpdateError(null);
+
+    try {
+      const token = localStorage.getItem("token");
+      
+      if (!token) {
+        throw new Error("No authentication token found");
+      }
+
+      const response = await fetch("http://localhost:4000/api/users/editSellerProfile", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          name: data.fullName,
+          email: data.email,
+          phone: data.phone,
+          storeName: data.storeName,
+          storeDescription: data.storeDescription,
+          Country: data.Country,
+          city: data.city,
+          postalCode: data.postalCode,
+          adresse: data.adresse,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to update profile");
+      }
+
+      const result = await response.json();
+      console.log("Profile updated:", result);
+      
+      setUpdateSuccess(true);
+      
+      // Refresh user data
+      await fetchUser();
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateSuccess(false), 3000);
+      
+    } catch (error) {
+      console.error("Error updating profile:", error);
+      setUpdateError(error instanceof Error ? error.message : "Failed to update profile");
+      
+      // Clear error message after 5 seconds
+      setTimeout(() => setUpdateError(null), 5000);
+    }
   };
 
   const handleConnectStripe = () => {
@@ -103,6 +178,25 @@ export default function Settings() {
     <div className="max-w-7xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-semibold">Settings</h1>
 
+      {/* Success/Error Messages */}
+      {updateSuccess && (
+        <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded">
+          <p className="flex items-center">
+            <CheckCircle className="h-5 w-5 mr-2" />
+            Profile updated successfully!
+          </p>
+        </div>
+      )}
+      
+      {updateError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <p className="flex items-center">
+            <AlertCircle className="h-5 w-5 mr-2" />
+            {updateError}
+          </p>
+        </div>
+      )}
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Profile Form */}
         <div className="lg:col-span-2 border rounded-lg p-6 bg-white shadow">
@@ -114,10 +208,10 @@ export default function Settings() {
               { name: "email", label: "Email" },
               { name: "phone", label: "Phone" },
               { name: "storeName", label: "Store Name" },
-              { name: "street", label: "Street" },
+              { name: "adresse", label: "adresse" },
               { name: "city", label: "City" },
               { name: "postalCode", label: "Postal Code" },
-              { name: "country", label: "Country" },
+              { name: "Country", label: "Country" },
             ].map((field) => (
               <div key={field.name}>
                 <label className="block text-sm font-medium">

@@ -236,7 +236,7 @@ export function OrderDetail({ id }: OrderDetailProps) {
                 Close
               </Button>
               <Button className="bg-cyan-500 hover:bg-cyan-600">
-                Print Order
+                Done
               </Button>
             </div>
           </div>
