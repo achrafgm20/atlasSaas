@@ -7,6 +7,8 @@ dotenv.config()
 import Stripe from "stripe"
 import Cart from "../models/cartModel";
 import Order from "../models/ordersModel";
+import Notification from "../models/notificationModel";
+import { io } from "../server";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)  
 export const createCheckoutSession = asyncHandler(async(req:Request,res:Response) => {
     try {
@@ -90,13 +92,30 @@ export const createCheckoutSession = asyncHandler(async(req:Request,res:Response
             success_url: `${process.env.CLIENT_URL}/PaymentSuccess`,
             cancel_url: `${process.env.CLIENT_URL}/PaymentFailed`, 
         })
-        await Order.create({
+        const order = await Order.create({
             buyer:clientId,
             items:orderItems,
             totalAmount:totalAmout,
             stripeSessionId:session.id,
             status:"pending"
         })
+        for(let item of order.items){
+            const sellerId = item.sellerId.toString()
+            await Notification.create({
+                user:item.sellerId,
+                type:"order",
+                title:"New Order",
+                body:"You received a new order",
+                link:`/seller/orders/${order._id}`
+            })
+            io.to(sellerId).emit("notification",{
+                type:"order",
+                title:"New Order",
+                body:`You received a new Order for ${item.productName}`,
+                orderId:order._id,
+            })
+        }
+        
             
             res.status(200).json({url:session.url})
 

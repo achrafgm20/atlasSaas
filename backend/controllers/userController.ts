@@ -138,6 +138,23 @@ export const getMe = asyncHandler(async (req:Request,res:Response) => {
 
 
 
+export const editSellerProfile = asyncHandler(async(req:Request,res:Response)=> {
+    try{
+        const userId = req.user
+        const userExist = await User.findById(userId)
+        if(!userExist || userExist.role !== "Seller"){
+            res.status(404).json({message:"seller not found"})
+            return
+        }
+        const {name,email,phone,storeName,storeDescription,adresse,city,postalCode,Country} = req.body
+        const editedProfile = await User.findByIdAndUpdate(userId,{name,email,phone,storeName,storeDescription,adresse,city,postalCode,Country},{new:true,runValidators:true}).select("-password")
+        res.status(200).json({message:"seller edited succefully",editedProfile})
+    }catch(err){
+        res.status(400).json({message:"error while editing seller s profile ",err})
+        console.error(err)
+    }
+    
+})
 
 
 export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Response) => {

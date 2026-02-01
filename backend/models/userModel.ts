@@ -11,7 +11,14 @@ export interface IUser extends Document {
     stripeDetailsSubmitted?:boolean
     canReceiveTransfers?:boolean
     transfersCapability?:"inactive" | "pending" | "active";
-    lastStripeSync?:Date
+    lastStripeSync?:Date,
+    phone:string,
+    storeName:string,
+    storeDescription:string,
+    adresse:string,
+    city:string,
+    postalCode:string,
+    Country:string
 }
 
 const userSchema =new  Schema<IUser>(
@@ -50,7 +57,15 @@ const userSchema =new  Schema<IUser>(
             enum: ["inactive", "pending", "active"],
             default: "inactive"
         },
-        lastStripeSync: { type: Date }
+        lastStripeSync: { type: Date },
+        phone:{type:String,required:false},
+        storeName:{type:String,required:false},
+        storeDescription:{type:String,required:false},
+        adresse:{type:String,required:false},
+        city:{type:String,required:false},
+        postalCode:{type:String,required:false},
+        Country:{type:String,required:false},
+
     },
     {
         timestamps : true 
