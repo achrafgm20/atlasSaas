@@ -66,7 +66,7 @@ export const getSellersProducts = asyncHandler(async(req:Request,res:Response) =
     const skip = (page - 1)*limit
     const totalProducts = await Product.countDocuments({seller:sellerId})
 
-    const products = await Product.find({seller:sellerId}).sort({createdAt:-1}).skip(skip).limit(limit)
+    const products = await Product.find({seller:sellerId,status:"Active"}).sort({createdAt:-1}).skip(skip).limit(limit)
     res.status(200).json({
         products,
         pagination:{

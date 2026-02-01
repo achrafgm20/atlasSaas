@@ -33,6 +33,7 @@ export const getCreatedDiscussion = asyncHandler(async(req:Request,res:Response)
             seller:product.seller as mongoose.Types.ObjectId,
             buyers:[]
         })
+        
     }
     //const userObjectId = new mongoose.Types.ObjectId(userId)
     if(userRole == "Buyer"){
