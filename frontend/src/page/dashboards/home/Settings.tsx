@@ -5,6 +5,7 @@ import * as z from "zod";
 import { Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { UseAuth } from "@/context/AuthContext";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface User {
   id: string;
   name: string;
@@ -22,11 +23,12 @@ interface User {
   stripeOnboardingUrl?: string;
   stripeAccountId?: string;
   stripeOnboardingCompleted?: boolean;
-  stripeDetailsSubmitted?: boolean;
+  
   canReceiveTransfers?: boolean;
   onboardingComplete?: boolean;
   transfersActive?: boolean;
   canReceiveMoney?: boolean;
+  stripeDetailsSubmitted?: boolean;
 }
 
 // Validation schema
