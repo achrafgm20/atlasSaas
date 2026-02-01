@@ -83,3 +83,24 @@ export const getAllBuyerOrders = asyncHandler(async(req:Request,res:Response) =>
         console.error(err)
     }
 })
+
+
+export const getDetailsOrderSeller = asyncHandler(async(req:Request,res:Response)=> {
+    try {
+        const sellerId = req.user as string
+        const sellerExist = await User.findById(sellerId)
+        if(!sellerExist || sellerExist.role !== "Seller"){
+            res.status(403).json({message:"this seller is not exist"})
+            return
+        }
+        const {orderId} = req.params
+        const orders = await Order.findById(orderId)
+                .populate({path:"items.productId",select:"images"})
+        res.status(200).json({orders})
+        return 
+
+    }catch(err){
+        console.error("error fetching details order",err)
+        res.status(404).json({message:"err while ferching details order",err})
+    }
+})
