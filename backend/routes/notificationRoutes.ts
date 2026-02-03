@@ -4,4 +4,7 @@ import { protect } from "../middleware/authMiddleware";
 
 const notificationRouter  = express.Router()
 notificationRouter.get("/getSellerNotifications",protect,getAllNotification)
-notificationRouter.patch("/markNotifAsRead",protect,markNotificationAsRead)
+notificationRouter.patch("/markNotifAsRead/:id",protect,markNotificationAsRead)
+
+
+export default notificationRouter
