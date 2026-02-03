@@ -7,7 +7,7 @@ import DashboardLayout from './page/layouts/DashboardLayout';
 import Dashboard from './page/dashboards/home/Dashboard';
 import Products from './page/dashboards/home/Products';
 import Orders from './page/dashboards/home/Orders';
-import Messages from './page/dashboards/home/Messages';
+
 import SalesOverview from './page/dashboards/home/SalesOverview';
 import { AuthProvider } from './context/AuthContext';
 import SellerRoute from './page/layouts/SellerRoute';
@@ -21,6 +21,7 @@ import PageOrder from './page/buyerPage/pageBuyer/PageOrder';
 import Settings from './page/dashboards/home/Settings';
 import PaymentSuccess from './page/buyerPage/components/PaymentSuccess';
 import PaymentFailed from './page/buyerPage/components/PaymentFailed';
+import Notifications from './page/dashboards/home/Notifications';
 
 
 function App() {
@@ -53,7 +54,7 @@ function App() {
           <Route path='/dashboard/products' element={<Products />} />
           <Route path='/dashboard/ProductPageSeller/:id' element={<ProductPageSeller />} />
           <Route path='/dashboard/Orders' element={<Orders />} />
-          <Route path='/dashboard/Messages' element={<Messages />} />
+          <Route path='/dashboard/Notifications' element={<Notifications />} />
           <Route path='/dashboard/sales' element={<SalesOverview />} />
           <Route path='/dashboard/settings' element={<Settings />} />
         </Route>
