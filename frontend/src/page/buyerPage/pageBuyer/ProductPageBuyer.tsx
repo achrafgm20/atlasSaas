@@ -2,11 +2,12 @@ import { Button } from '@/components/ui/button';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ArrowLeft, CheckCircle2, User } from 'lucide-react'; 
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'; 
 import {moneyDhForma} from '@/lib/utils'
 import Policy from '../components/Policy';
 import { useCart } from '@/context/CartFavContext';
 import ChatApp from '../components/ChatApp';
+import ProfilSeller from '../components/ProfilSeller';
 
 
 // 2. Define the Image Interface 
@@ -204,23 +205,7 @@ const getConditionStyles = (condition: string): string => {
             </div>
 
             {/* Seller Info */}
-            <div className="mt-auto border-t border-gray-100 pt-5">
-              <p className="mb-3 text-xs font-bold uppercase tracking-wider text-gray-400">Sold By</p>
-              <div className="flex items-center gap-4">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-gray-500">
-                  <User size={24} />
-                </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">
-                    {product.seller?.name || 'Unknown Seller'}
-                  </h3>
-                  <p className="text-sm text-gray-500">Verified Seller</p>
-                </div>
-                <div className="ml-auto">
-                    <Button variant="outline" size="sm" className="text-xs">View Profile</Button>
-                </div>
-              </div>
-            </div>
+            <ProfilSeller product={product} />
 
           </div>
           
