@@ -21,6 +21,7 @@ import Discussion from './models/discussion';
 import Notifaction from './models/notificationModel';
 import mongoose from 'mongoose';
 import notificationRouter from './routes/notificationRoutes';
+import SalesRoutes from './routes/salesRoutes';
 
 
 
@@ -52,6 +53,7 @@ app.use("/api/discussion",discussionRoute)
 app.use("/api/checkout",CheckoutRouter)
 app.use("/api/orders",OrderRouter)
 app.use("/api/notification",notificationRouter)
+app.use("/api/trend",SalesRoutes)
 //this for uplaod images 
 // app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
