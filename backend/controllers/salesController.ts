@@ -12,25 +12,44 @@ export const Trend = asyncHandler(async(req:Request,res:Response) => {
         }
         const stats = await Order.aggregate([
 
-            { $match: { "items.sellerId": new mongoose.Types.ObjectId(sellerId) } },
+            { $match: {$and :[
+                {$or:[
+                {"items.sellerId": new mongoose.Types.ObjectId(sellerId) },
+                {"items.sellerId":sellerId}
+             ]},
+            {status:"paid"}
+            ]
+            } },
             {$group:{
                 _id:{$month:"$createdAt"},
                 totalRevenue : {$sum:"$totalAmount"},
                 totalOrder:{$sum:1}
 
             }},{
-                $sort:{" _id": 1}
+                $sort:{"_id": 1}
             }
         ])
-        console.log(stats)
+
+        const statsMap = new Map()
+        stats.forEach(stat => {
+            statsMap.set(
+                stat._id,{
+                revenue:stat.totalRevenue,
+                orders:stat.totalOrder
+            })
+        })
         
-    const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const result = []
+        for(let i = 1 ; i <= 12 ; i++){
+            const monthData = statsMap.get(i)
+            result.push({
+                month:monthNames[i-1],
+                revenue:monthData ? monthData.revenue : 0,
+                orders:monthData ? monthData.orders : 0,
+            })
+        }
         
-        const result =stats.map((itm) => ({
-            month:monthNames[itm._id -1],
-            revenue : itm.totalRevenue,
-            orders:itm.totalOrder
-        }))
         res.status(200).json(result)
 
     }catch(err){
