@@ -22,6 +22,7 @@ import Settings from './page/dashboards/home/Settings';
 import PaymentSuccess from './page/buyerPage/components/PaymentSuccess';
 import PaymentFailed from './page/buyerPage/components/PaymentFailed';
 import Notifications from './page/dashboards/home/Notifications';
+import DashboardAdmin from './page/adminPage/page/DashboardAdmin';
 
 
 function App() {
@@ -58,6 +59,10 @@ function App() {
           <Route path='/dashboard/sales' element={<SalesOverview />} />
           <Route path='/dashboard/settings' element={<Settings />} />
         </Route>
+      </Route>
+      {/* admin Routess */}
+      <Route>
+        <Route path='/admin' element={<DashboardAdmin />} />
       </Route>
       {/* Error page */}
       <Route path="*" element={<ErrorPage />} />
