@@ -322,3 +322,20 @@ export const detailsProduct = asyncHandler(async(req:Request,res:Response) => {
     
     
 })
+
+
+export const productSellersDetails = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const {productId} = req.params
+        const product = await Product.findOne({_id:productId}).populate("seller","-password")
+        console.log(productId)
+        if(!product){
+            res.status(400).json({message:"product is not found"})
+        }
+
+        res.status(200).json(product?.seller)
+    }catch(err){
+        res.status(404).json({message:"errer getting seller details"})
+        console.log("errer getting details seller")
+    }
+})
