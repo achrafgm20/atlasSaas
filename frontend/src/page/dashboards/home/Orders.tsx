@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { ShoppingCart } from "lucide-react";
 import axios from "axios";
+import { OrderDetail } from "../components/OrderDetail";
 
 interface ApiOrder {
   _id: string;
@@ -50,7 +51,7 @@ const OrdersTable: React.FC = () => {
 
     fetchOrders();
   }, [token]);
-
+console.log(orders)
   if (loading) {
     return (
       <div className="p-10 text-center text-gray-500">
@@ -92,6 +93,7 @@ console.log(orders)
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Buyer</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Amount</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">show more detail</th>
                   </tr>
                 </thead>
 
@@ -122,6 +124,9 @@ console.log(orders)
 
                       <td className="px-6 py-4 text-sm font-semibold text-blue-600">
                         {order.totalAmount} $
+                      </td>
+                      <td className="px-6 py-4 text-sm font-semibold">
+                        <OrderDetail id={order._id}/>
                       </td>
                     </tr>
                   ))}

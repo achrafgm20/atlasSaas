@@ -192,7 +192,7 @@ function PageOrder() {
                       <div className="space-y-3">
                         {order.items.map((item: OrderItem, index: number) => (
                           <div key={index} className="flex gap-3 bg-white p-4 rounded-lg shadow-sm">
-                            <div className="w-20 h-20 bg-gradient-to-br from-blue-100 to-blue-200 rounded-md flex items-center justify-center">
+                            <div className="w-20 h-20 bg-linear-to-br from-blue-100 to-blue-200 rounded-md flex items-center justify-center">
                               <Package size={32} className="text-blue-600" />
                             </div>
                             <div className="flex-1">

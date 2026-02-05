@@ -3,6 +3,14 @@ import { createContext, useContext, useState, ReactNode } from 'react';
 
 
 interface User {
+  stripeDetailsSubmitted: boolean | undefined;
+  phone: string;
+  storeName: string;
+  adresse: string;
+  city: string;
+  storeDescription: string;
+  Country: string;
+  postalCode: string;
   id: string;
   name: string;
   email: string;
