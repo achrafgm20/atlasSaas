@@ -57,3 +57,65 @@ export const Trend = asyncHandler(async(req:Request,res:Response) => {
         console.log(err)
     }
 })
+
+
+export const cardsOverview =  asyncHandler(async(req:Request,res:Response) =>{
+    try {
+        const now = new Date()
+    const startOfThisMonth = new Date(now.getFullYear() , now.getMonth(),1)
+    const endOfThisMonth = new Date(now.getFullYear(),now.getMonth() + 1 , 0 , 23,59,59)
+    const startOfLastMonth = new Date(now.getFullYear(),now.getMonth() -1,1)
+    const endOfLastMonth = new Date(now.getFullYear(),now.getMonth(),0,23,59,59)
+    const thisMonthStats = await Order.aggregate([
+        {$match:{createdAt:{$gte:startOfThisMonth,$lte:endOfThisMonth}}},
+        {$group:{
+            _id:null,
+            totalRevenue:{$sum:"$totalAmount"},
+            totalOrders:{$sum:1},
+            productsSold:{$sum:{$size:"$items"}}
+
+        }}
+    ])
+    const lastMonthStats = await Order.aggregate([
+      { $match: { createdAt: { $gte: startOfThisMonth, $lte: endOfThisMonth } } },
+        {$group:{
+            _id:null,
+            totalRevenue:{$sum:"$totalAmount"},
+            totalOrders:{$sum:1},
+            productsSold:{$sum:{$size:"$items"}}
+
+        }}
+    ])
+
+    const thisMonth = thisMonthStats[0] || {totalRevenue: 0, totalOrders: 0, productsSold: 0 }
+    const lastMonth = lastMonthStats[0] || {totalRevenue: 0, totalOrders: 0, productsSold: 0 }
+    const thisAvg = thisMonth.totalOrder ? thisMonth.totalRevenue / thisMonth.totalOrder : 0
+    const lastAvg = lastMonth.totalOrder ? lastMonth.totalRevenue / lastMonth.totalOrder : 0
+    const calcGrowth = (current:number,preview:number) => {
+        if(preview === 0 ) return current === 0 ? 0 : 100
+        return ((current - preview) / preview) * 100
+    }
+    res.status(200).json({
+            totalRevenue: {
+            value: thisMonth.totalRevenue,
+            growth: calcGrowth(thisMonth.totalRevenue, lastMonth.totalRevenue)
+        },
+            totalOrders: {
+            value: thisMonth.totalOrders,
+            growth: calcGrowth(thisMonth.totalOrders, lastMonth.totalOrders)
+        },
+            avgOrderValue: {
+            value: thisAvg,
+            growth: calcGrowth(thisAvg, lastAvg)
+        },
+            productsSold: {
+            value: thisMonth.productsSold,
+            growth: calcGrowth(thisMonth.productsSold, lastMonth.productsSold)
+        }
+    })
+    }catch(err){
+        res.status(400).json({message:"error while getting cards salles over view",err})
+        console.error(err)
+    }
+    
+})
