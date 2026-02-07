@@ -142,7 +142,9 @@ io.on("connection", async(socket) => {
       type:"message" as "message" ,
       title:"New Message",
       body:message.content as string,
-      link:`/seller/discussion/${discussionId}`
+      targetType:"product",
+      targetId:discution.product,
+      conversationId:discussionId
     })
     io.to(sellerId).emit("notification",{
       type:"message",

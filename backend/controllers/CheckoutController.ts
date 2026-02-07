@@ -9,6 +9,7 @@ import Cart from "../models/cartModel";
 import Order from "../models/ordersModel";
 import Notification from "../models/notificationModel";
 import { io } from "../server";
+import { sendOrderPaidEmail } from "../services/emailService";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)  
 export const createCheckoutSession = asyncHandler(async(req:Request,res:Response) => {
     try {
@@ -106,7 +107,8 @@ export const createCheckoutSession = asyncHandler(async(req:Request,res:Response
                 type:"order",
                 title:"New Order",
                 body:"You received a new order",
-                link:`/seller/orders/${order._id}`
+                targetType:"order",
+                targetId:order._id
             })
             io.to(sellerId).emit("notification",{
                 type:"order",
@@ -188,6 +190,13 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
                     transfer_group:session.payment_intent as string
                 })
             }
+            if(!order?.customerEmail){
+                console.log("customer email missing for order",order)
+            }else {
+                await sendOrderPaidEmail(order.customerEmail,order._id.toString())
+
+            }
+
             //update status of products to sold 
             const productsIds = order.items.map((it) => it.productId)
             await Product.updateMany(
