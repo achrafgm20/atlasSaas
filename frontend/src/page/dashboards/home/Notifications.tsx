@@ -391,6 +391,53 @@ export function Notifications() {
     }
   };
 
+  // New function to handle view details click
+  const handleViewDetails = async (notificationId: string, event: React.MouseEvent) => {
+    event.stopPropagation(); // Prevent triggering the parent onClick
+    
+    try {
+      const response = await fetch(
+        `http://localhost:4000/api/notification/viewDetails/${notificationId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch notification details");
+      }
+
+      const data = await response.json();
+      console.log("Notification details:", data);
+      
+      // Navigate to the product/order page based on the API response
+      if (data.link) {
+        window.location.href = data.link;
+      } else if (data.productLink) {
+        window.location.href = data.productLink;
+      } else if (data.url) {
+        window.location.href = data.url;
+      } else if (data.productId) {
+        window.location.href = `/dashboard/products?productId=${data.productId}`;
+      } else if (data.orderId) {
+        window.location.href = `/dashboard/orders?orderId=${data.orderId}`;
+      } else {
+        console.warn("No navigation link found in response");
+      }
+    } catch (err) {
+      console.error("Error fetching notification details:", err);
+      // Optionally show an error toast to the user
+      setToastNotification({
+        title: "Error",
+        body: "Could not load notification details",
+        type: "message",
+      });
+    }
+  };
+
   const markAllAsRead = () => {
     setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
   };
@@ -604,7 +651,7 @@ export function Notifications() {
 
                                 {/* Unread indicator */}
                                 {!notification.isRead && (
-                                  <div className="flex-shrink-0 ml-4">
+                                  <div className="shrink-0 ml-4">
                                     <div className="h-2.5 w-2.5 rounded-full bg-blue-500"></div>
                                   </div>
                                 )}
@@ -628,14 +675,12 @@ export function Notifications() {
                                   Mark as read
                                 </button>
                               )}
-                              {notification.link && (
-                                <a
-                                  href={notification.link}
-                                  className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                  View details →
-                                </a>
-                              )}
+                              <button
+                                onClick={(e) => handleViewDetails(notification._id, e)}
+                                className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                              >
+                                View details →
+                              </button>
                             </div>
                           </div>
                         </div>
