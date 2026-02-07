@@ -34,3 +34,22 @@ export const markNotificationAsRead = asyncHandler(async(req:Request,res:Respons
         console.error(err)
     }
 })
+
+
+export const viewDetails = asyncHandler(async(req:Request,res:Response) => {
+    const {id} = req.params
+    const userId = req.user 
+    const sellerExist = await User.findById(userId)
+    if(!sellerExist){
+        res.status(404).json("seller not found")
+    }
+    const notification = await Notification.findOne({_id:id,user:userId})
+    if(!notification){
+        res.status(404).json("can t find notification ")
+        return
+    }
+    notification.isRead = true
+    notification.save()
+    const redirect = notification.type === "order" ? {to : "order-details",orderId:notification.targetId} : {to:"product-chat",productId:notification.targetId,conversationId:notification.conversationId}
+    res.status(200).json({message:"notofication marked as readadaaadad ",redirect})
+})

@@ -5,8 +5,10 @@ export interface INotifaction extends Document {
     type:"order"| "message",
     title:string
     body:string
-    link?:string 
     isRead:boolean
+    targetType:"product" | "order"
+    targetId:Types.ObjectId
+    conversationId?:Types.ObjectId
     
 }
 
@@ -15,8 +17,10 @@ const notificationSchema = new Schema<INotifaction>({
     type:{type:String,enum:["order","message"],required:true},
     title:{type:String,required:true},
     body:{type:String,required:true},
-    link:{type:String},
-    isRead:{type:Boolean,default:false}
+    isRead:{type:Boolean,default:false},
+    targetType:{type:String,enum:["product","order"]},
+    targetId:{type:Schema.Types.ObjectId},
+    conversationId:{type:Schema.Types.ObjectId,required:false}
 },
 {
     timestamps:true,
