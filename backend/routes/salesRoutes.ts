@@ -1,8 +1,9 @@
 import express from "express";
 import { protect } from "../middleware/authMiddleware";
-import { Trend } from "../controllers/salesController";
+import { cardsOverview, Trend } from "../controllers/salesController";
 
 
 const SalesRoutes = express.Router()
 SalesRoutes.get("/Trend",protect,Trend)
+SalesRoutes.get("/cardOverviw",protect,cardsOverview)
 export default SalesRoutes

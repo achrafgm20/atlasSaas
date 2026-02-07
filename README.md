@@ -38,3 +38,8 @@ npm install socket.io-client --save-dev
 
 <!-- install stripe  -->
 npm install stripe
+
+
+npm install nodemailer
+
+npm install --save-dev @types/nodemailer
