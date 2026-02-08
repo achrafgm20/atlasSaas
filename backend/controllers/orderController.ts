@@ -116,3 +116,29 @@ export const getDetailsOrderSeller = asyncHandler(async(req:Request,res:Response
         res.status(404).json({message:"err while ferching details order",err})
     }
 })
+
+
+export const getAllOders = asyncHandler(async(req:Request,res:Response) => {
+    const orders = await Order.find().populate("buyer","name email").populate("items.sellerId","name email")
+    res.status(200).json({message:"all orders fetched succufly",orders})
+})
+
+
+export const editOrderStatus = asyncHandler(async(req:Request,res:Response) => {
+    const {orderId} = req.params
+    const {status} = req.body
+
+    const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled", "failed"]
+    if(!status || !allowedStatuses.includes(status)){
+        res.status(400).json("Invalid status value")
+        return 
+    }
+    const order = await Order.findById(orderId)
+    if(!order){
+        res.status(404).json("order not found")
+        return
+    }
+    order.status = status
+    await order.save()
+    res.status(200).json({message:`order status updated succc to ${status}`,order})
+})
