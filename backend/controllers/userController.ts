@@ -4,6 +4,7 @@ import User, { IUser } from "../models/userModel"
 import bcrypt = require("bcrypt");
 import jwt = require("jsonwebtoken");
 import Stripe from 'stripe';
+import message from '../models/message';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 // function register 
 export const registerUser = asyncHandler(async (req:Request,res:Response) => {
@@ -226,4 +227,55 @@ export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Re
     // Redirect directly to the new onboarding URL
     res.redirect(accountLink.url);
 });
+
+
+
+
+export const getAllUsers = asyncHandler(async(req:Request,res:Response) => {
+    const users = await User.find({role:{$in:["Buyer","Seller"]}}).select("-password")
+    res.status(200).json(users)
+})
+
+
+export const deleteUser = asyncHandler(async(req:Request,res:Response) => {
+    const {userIdToDelete} = req.params
+    const user = await User.findById(userIdToDelete)
+    if(!user){
+        res.status(404).json("user not found")
+        console.error("user not found");
+    }
+    if(user?.role === "Admin"){
+        res.status(403).json("you can t delete an admin account ")
+    }
+    await user?.deleteOne()
+    res.status(200).json({message:"User deleted successfully"})
+
+})
+
+export const getAllSellers = asyncHandler(async(req:Request,res:Response) => {
+    const sellers = await User.find({role:"Seller"}).select("-password")
+    res.status(200).json(sellers)
+
+})
+
+
+export const editStatusSeller = asyncHandler(async(req:Request,res:Response) => {
+    const SellerId = req.params.SellerId
+    const {statutCompte} = req.body
+    const seller = await User.findById(SellerId)
+    if(!seller || seller.role !== "Seller"){
+         res.status(404).json("seller not found")
+         return
+    }
+    const allowedStatus = ["Approved", "Pending", "Rejected"]
+
+    if(!statutCompte || !allowedStatus.includes(statutCompte)){
+          res.status(400).json({message:"Invalid value status "})
+          return
+    }
+    seller.statutCompte = statutCompte
+    await seller.save()
+    res.status(200).json({message: "Seller status updated successfully",seller})
+})
+
 
