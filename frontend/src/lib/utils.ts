@@ -6,7 +6,7 @@ export function cn(...inputs: (string | undefined | null | Record<string, boolea
 }
 
 
-export function moneyDhForma(m: number) {
+export function moneyDhForma1(m: number) {
   const formatteurMA = new Intl.NumberFormat('fr-MA', {
         style: 'currency',
         currency: 'MAD', // Code ISO pour le Dirham Marocain
@@ -17,6 +17,14 @@ export function moneyDhForma(m: number) {
 }
 
 
+export function moneyDhForma(m: number) {
+  const formatterUS = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
-
+  return formatterUS.format(m);
+}
 

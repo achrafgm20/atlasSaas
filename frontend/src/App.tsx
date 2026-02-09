@@ -22,7 +22,12 @@ import Settings from './page/dashboards/home/Settings';
 import PaymentSuccess from './page/buyerPage/components/PaymentSuccess';
 import PaymentFailed from './page/buyerPage/components/PaymentFailed';
 import Notifications from './page/dashboards/home/Notifications';
-import DashboardAdmin from './page/adminPage/page/DashboardAdmin';
+import DashboardAdmin from './page/adminPage/DashboardAdmin';
+import AdminRoute from './page/adminPage/AdminRoute';
+import BuyerSellerPage from './page/adminPage/page/BuyerSellerPage';
+import OrdersAdmin from './page/adminPage/page/OrdersAdmin';
+import SellerAproval from './page/adminPage/page/SellerAproval';
+import DashboardSales from './page/adminPage/page/DashboardSales';
 
 
 function App() {
@@ -61,8 +66,15 @@ function App() {
         </Route>
       </Route>
       {/* admin Routess */}
+       {/* element={<AdminRoute />} */}
       <Route>
-        <Route path='/admin' element={<DashboardAdmin />} />
+        <Route path='/admin' element={<DashboardAdmin />}>
+          <Route path='/admin/BuyerSellerPage' element={<BuyerSellerPage />} />
+          <Route path='/admin/OrdersAdmin' element={<OrdersAdmin />} />
+          <Route path='/admin/SellerAproval' element={<SellerAproval />} />
+          <Route path='/admin/dashboard' element={<Dashboard />} />
+          <Route path='/admin/dashboardSales' element={<DashboardSales />} />
+        </Route>
       </Route>
       {/* Error page */}
       <Route path="*" element={<ErrorPage />} />
