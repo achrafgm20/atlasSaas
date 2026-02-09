@@ -3,8 +3,8 @@ export interface IUser extends Document {
     name:string
     email:string
     password:string
-    role:"Seller"|"Buyer"|"admin"
-    statutCompte:Boolean,
+    role:"Seller"|"Buyer"|"Admin"
+    statutCompte:"Approved"|"Pending"|"Rejected"
     stripeAccountId?: string;
     stripeOnboardingUrl?:string;
     stripeOnboardingCompleted?:boolean
@@ -40,13 +40,17 @@ const userSchema =new  Schema<IUser>(
         },
         role: {
             type: String,
-            enum : ["Seller","Buyer","admin"],
+            enum : ["Seller","Buyer","Admin"],
             required : true 
         },
-        statutCompte : {
-            type:Boolean,
-            default: false
-        },
+        statutCompte: {
+    type: String,
+    enum: ["Approved", "Pending", "Rejected"],
+    default: function(this: IUser): "Approved" | "Pending" {
+        return this.role === "Buyer" ? "Approved" : "Pending";
+    }
+},
+
         stripeAccountId: { type: String, required: false },
         stripeOnboardingUrl: { type: String },
         stripeOnboardingCompleted: { type: Boolean, default: false },
@@ -71,13 +75,13 @@ const userSchema =new  Schema<IUser>(
         timestamps : true 
     }
 )
-userSchema.pre("save",function(next){
-    if(this.role === "Buyer"){
-        this.statutCompte = true
-    }else if(this.role ==="Seller"){
-        this.statutCompte = false
-    }
-    // next()
-})
+// userSchema.pre("save",function(next){
+//     if(this.role === "Buyer"){
+//         this.statutCompte = "Approved"
+//     }else if(this.role ==="Seller"){
+//         this.statutCompte = "Pending"
+//     }
+//     // next()
+// })
 
 export default mongoose.model<IUser>("User",userSchema)
