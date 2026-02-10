@@ -3,6 +3,7 @@ import  asyncHandler from 'express-async-handler';
 import User from '../models/userModel';
 import Order from '../models/ordersModel';
 import mongoose from 'mongoose';
+import Product from '../models/productModel';
 export const Trend = asyncHandler(async(req:Request,res:Response) => {
     try {
         const sellerId = req.user  as string
@@ -213,3 +214,29 @@ export const getAdminGains = asyncHandler(async(req:Request,res:Response) => {
         
     }
 }) 
+
+
+
+
+export const getAdmiCards = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const totalUsers = await User.countDocuments()
+        const totalVenders = await User.countDocuments({role:"Seller"})
+        //change to status = "paid"
+        const totalOrders = await Order.countDocuments()
+        const totalProducts = await Product.countDocuments()
+        const revenueResult = await Order.aggregate([
+            //change this line 
+            {$match:{status:"paid"}},
+            {$group:{
+                _id:null,
+                total:{$sum:"$totalAmount"}
+            }}
+        ])
+        const totalRevenue = revenueResult[0]?.total || 0
+        res.status(200).json({totalUsers,totalOrders,totalVenders,totalProducts,totalRevenue})
+    }catch(err){
+        res.status(404).json({message:"failed to load card dahsboard admin",err})
+        console.error(err)
+    }
+})
