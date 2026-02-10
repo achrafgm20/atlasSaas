@@ -5,7 +5,7 @@ import {
   Users, 
   CheckCircle, 
   ShoppingCart, 
-  TrendingUp, 
+
 } from 'lucide-react';
 
 const SideBarAdmin = () => {
@@ -16,7 +16,6 @@ const SideBarAdmin = () => {
     { path: '/admin/BuyerSellerPage', label: 'Users & Vendors', icon: Users },
     { path: '/admin/SellerAproval', label: 'Vendor Approvals', icon: CheckCircle },
     { path: '/admin/OrdersAdmin', label: 'Orders', icon: ShoppingCart },
-    { path: '/admin/dashboardSales', label: 'Sales & Revenue', icon: TrendingUp },
     
   ];
 

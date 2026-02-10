@@ -27,7 +27,8 @@ import AdminRoute from './page/adminPage/AdminRoute';
 import BuyerSellerPage from './page/adminPage/page/BuyerSellerPage';
 import OrdersAdmin from './page/adminPage/page/OrdersAdmin';
 import SellerAproval from './page/adminPage/page/SellerAproval';
-import DashboardSales from './page/adminPage/page/DashboardSales';
+import DashboardAdminSeller from './page/adminPage/page/DashboardAdminSeller';
+
 
 
 function App() {
@@ -72,8 +73,7 @@ function App() {
           <Route path='/admin/BuyerSellerPage' element={<BuyerSellerPage />} />
           <Route path='/admin/OrdersAdmin' element={<OrdersAdmin />} />
           <Route path='/admin/SellerAproval' element={<SellerAproval />} />
-          <Route path='/admin/dashboard' element={<Dashboard />} />
-          <Route path='/admin/dashboardSales' element={<DashboardSales />} />
+          <Route path='/admin/dashboard' element={<DashboardAdminSeller />} />
         </Route>
       </Route>
       {/* Error page */}
