@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Clock, Truck, XCircle, AlertCircle , Package, Calendar, CreditCard, CheckCircle, ChevronDown, ChevronUp, Loader, BanknoteArrowUp } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
+import Invoice from '../components/Invoice';
 
 // Type definitions
 interface Seller {
@@ -194,6 +195,7 @@ return (
                         {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                         
                       </span>
+                      
                     </div>
                     
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
@@ -283,6 +285,7 @@ return (
                             <p className="text-sm font-semibold text-gray-800">
                               Stripe Payment
                             </p>
+                            <Invoice id={order._id} />
                           </div>
                           
                           <div className="pb-3 border-b">
