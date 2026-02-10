@@ -8,5 +8,5 @@ OrderRouter.get("/BuyerSOrders",protect,getAllBuyerOrders)
 OrderRouter.get("/getDetailsOrder/:orderId",protect,getDetailsOrderSeller)
 OrderRouter.get("/AllOrderAdmin",protect,adminOnly,getAllOders)
 OrderRouter.patch("/editOrderStatus/:orderId",protect,adminOnly,editOrderStatus)
-OrderRouter.get("/orderInvoice/:orderId",protect,generateInvoice)
+OrderRouter.get("/orderInvoice/:orderId",generateInvoice)
 export default OrderRouter

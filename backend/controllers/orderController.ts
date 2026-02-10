@@ -19,9 +19,10 @@ export const getSellerOrders = asyncHandler(async(req:Request,res:Response) =>{
         const page = Number(req.query.page) || 1
         const limit = Number(req.query.limit) || 10
         const skip = (page - 1) * limit
-        const totalOrders = await Order.countDocuments({"items.sellerId":sellerId,status:"paid"})
-
-        const orders = await Order.find({"items.sellerId":sellerId,status:"paid"}).populate({path:"buyer",select:"name"})
+        //chaneg if sttais = paid
+        const totalOrders = await Order.countDocuments({"items.sellerId":sellerId})
+        //chnange if status paid
+        const orders = await Order.find({"items.sellerId":sellerId}).populate({path:"buyer",select:"name"})
                                 .sort({createdAt:-1})
                                 .skip(skip)
                                 .limit(limit)
@@ -200,99 +201,120 @@ export const generateInvoice = asyncHandler(async (req: Request, res: Response) 
       `attachment; filename=invoice-${orderId}.pdf`
     );
     doc.pipe(res);
-
-    // ================= HEADER =================
     doc
-      .image("path/to/logo.png", 50, 45, { width: 120 }) // optional: company logo
-      .fontSize(20)
-      .text("AtlasTech", 200, 50, { align: "right" })
+      .fillColor("#2563eb")
+      .fontSize(28)
+      .text("INVOICE", 50, 50);
+
+    doc
+      .fillColor("#374151")
       .fontSize(10)
-      .text(`Order ID: ${order._id}`, { align: "right" })
-      .text(`Date: ${(order as any).createdAt.toDateString()}`, {
-        align: "right",
-      })
-      .moveDown();
-
+      .text("AtlasTech", 400, 50, { align: "right" })
+      .text("123 Business Street", 400, 65, { align: "right" })
+      .text("City, State 12345", 400, 80, { align: "right" })
+      .text("contact@atlastech.com", 400, 95, { align: "right" });
     doc
-      .fillColor("#444444")
-      .fontSize(20)
-      .text("Invoice", 50, 150);
-
-    // ================= BILLING INFO =================
-    doc
+      .fillColor("#6b7280")
       .fontSize(10)
-      .text("Billing Address:", 50, 200)
-      .text(order.billingAddress?.line1 || "", 50, 215)
-      .text(order.billingAddress?.line2 || "", 50, 230)
-      .text(
-        `${order.billingAddress?.city || ""}, ${order.billingAddress?.country || ""} ${order.billingAddress?.postal_code || ""}`,
-        50,
-        245
-      )
-      .moveDown();
-
-    // ================= TABLE HEADER =================
-    const tableTop = 300;
-    const itemX = 50;
-    const priceX = 350;
-    const totalX = 450;
-
+      .text(`Invoice #: ${order._id}`, 50, 120)
+      .text(`Date: ${(order as any).createdAt.toDateString()}`, 50, 135)
+      .text(`Status: ${order.status.toUpperCase()}`, 50, 150);
     doc
+      .fillColor("#111827")
       .fontSize(12)
-      .fillColor("black")
-    //   .text("Product", itemX, tableTop, { bold: true })
-      .text("Price", priceX, tableTop)
-      .text("Total", totalX, tableTop);
+      .text("Bill To:", 50, 190);
 
-    // Draw line under header
-    doc.moveTo(50, tableTop + 20).lineTo(550, tableTop + 20).stroke();
+    doc
+      .fillColor("#374151")
+      .fontSize(10)
+      .text(order.customerEmail || "Customer", 50, 210)
+      .text(order.billingAddress?.line1 || "", 50, 225);
+    
+    if (order.billingAddress?.line2) {
+      doc.text(order.billingAddress.line2, 50, 240);
+    }
+    
+    doc.text(
+      `${order.billingAddress?.city || ""}, ${order.billingAddress?.state || ""} ${order.billingAddress?.postal_code || ""}`,
+      50,
+      order.billingAddress?.line2 ? 255 : 240
+    );
+    const tableTop = 310;
+    
+    doc
+      .rect(50, tableTop, 500, 25)
+      .fillAndStroke("#2563eb", "#2563eb");
 
-    // ================= TABLE ROWS =================
-    let i = 0;
-    const rowHeight = 25;
-    order.items.forEach((item: any, idx: number) => {
-      const y = tableTop + 30 + i * rowHeight;
-
-      // alternate row background color
-      if (i % 2 === 0) {
-        doc.rect(50, y - 5, 500, rowHeight).fill("#f5f5f5").fillColor("black");
+    doc
+      .fillColor("#ffffff")
+      .fontSize(11)
+      .text("Product", 60, tableTop + 8)
+      .text("Price", 380, tableTop + 8)
+      .text("Total", 480, tableTop + 8);
+    let yPosition = tableTop + 35;
+    
+    order.items.forEach((item: any, index: number) => {
+      // Alternate row colors
+      if (index % 2 === 0) {
+        doc
+          .rect(50, yPosition - 5, 500, 25)
+          .fillAndStroke("#f9fafb", "#f9fafb");
       }
 
       doc
-        .fillColor("black")
+        .fillColor("#374151")
         .fontSize(10)
-        .text(item.productName, itemX, y)
-        .text(`$${item.price}`, priceX, y)
-        .text(`$${item.price}`, totalX, y);
+        .text(item.productName, 60, yPosition, { width: 300 })
+        .text(`$${item.price.toFixed(2)}`, 380, yPosition)
+        .text(`$${item.price.toFixed(2)}`, 480, yPosition);
 
-      i++;
+      yPosition += 25;
     });
 
-    // ================= TOTAL =================
-    const totalAmount = order.items.reduce(
-      (sum: number, item: any) => sum + item.price,
-      0
-    );
-
     doc
-      .fontSize(14)
-      .fillColor("black")
-      .text(`Total: $${totalAmount}`, totalX, tableTop + 30 + i * rowHeight + 20, {
-        align: "right",
-      });
+      .moveTo(50, yPosition)
+      .lineTo(550, yPosition)
+      .strokeColor("#e5e7eb")
+      .stroke();
 
-    // ================= FOOTER =================
+        const totalAmount = order.items.reduce(
+        (sum: number, item: any) => sum + item.price,
+        0
+        );
+
+        yPosition += 20;
+        doc
+        .fillColor("#6b7280")
+        .fontSize(11)
+        .text("Subtotal:", 380, yPosition, { width: 80, align: 'left' })
+        .text(`$${totalAmount.toFixed(2)}`, 480, yPosition, { width: 70, align: 'right' });
+
+        yPosition += 25;
+        doc
+        .rect(350, yPosition - 5, 200, 30)
+        .fillAndStroke("#f0f9ff", "#f0f9ff");
+
+        doc
+        .fillColor("#111827")
+        .fontSize(14)
+        .text("Total Amount:", 360, yPosition + 5, { width: 100, align: 'left' });
+        
+        doc
+        .fillColor("#2563eb")
+        .fontSize(16)
+        .text(`$${totalAmount.toFixed(2)}`, 480, yPosition + 5, { width: 70, align: 'right' });
     doc
-      .fontSize(10)
-      .fillColor("gray")
+      .fillColor("#6b7280")
+      .fontSize(9)
       .text(
-        "Thank you for your purchase! If you have any questions, contact us at support@atlastech.com",
+        "Thank you for your business! For questions, contact support@atlastech.com",
         50,
         750,
         { align: "center", width: 500 }
       );
 
     doc.end();
+
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to generate invoice" });
