@@ -119,3 +119,97 @@ export const cardsOverview =  asyncHandler(async(req:Request,res:Response) =>{
     }
     
 })
+
+
+
+export const trendMonthAdmin = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const stats = await Order.aggregate([
+         { $match: 
+            {status:"paid"}        
+            },
+            {$group:{
+                _id:{$month:"$createdAt"},
+                totalRevenue : {$sum:"$totalAmount"},
+            }},{
+                $sort:{"_id": 1}
+            }
+   ] )
+    const statsMap = new Map()
+        stats.forEach(stat => {
+            statsMap.set(
+                stat._id,{
+                revenue:stat.totalRevenue,
+            })
+        })
+
+   const monthNames = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+        const result = []
+        for(let i = 1 ; i <= 12 ; i++){
+            const monthData = statsMap.get(i)
+            result.push({
+                month:monthNames[i-1],
+                revenue:monthData ? monthData.revenue : 0,
+            })
+        }
+        
+        res.status(200).json(result)
+    }catch(err){
+        console.error("error fetching trend months for admin")
+    }
+})
+
+
+export const trendLastDaysAdmin = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const sevenDaysAgo = new Date()
+        sevenDaysAgo.setDate(sevenDaysAgo.getDate() -7)
+
+        const orders =await Order.aggregate([
+            {$match:{status:"paid",createdAt:{$gte:sevenDaysAgo}}},
+            {$group:{
+                _id:{
+                $dateToString:{format: "%Y-%m-%d" ,date:"$createdAt"}
+            },
+            totalOrders:{$sum:1},
+            totalRevenue:{$sum:"$totalAmount"}
+        },
+
+    },
+    {$sort:{_id:1}}
+        ])
+        res.status(200).json(orders)
+    }catch(err){
+        console.error("error fetching daily trends for admin",err)
+    }
+})
+
+
+
+export const getAdminGains = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const adminPercent = 10 
+        const stats = await Order.aggregate([
+            {$match:{status:"paid"}},
+            {$unwind:"$items"}, 
+            {$group:{
+                _id:null,
+                totalPlateFormGain:{
+                    $sum:{
+                        $multiply:[
+                            "$items.price",
+                            adminPercent / 100
+                        ]
+                    }
+
+                }
+            }}
+        ])
+        const totalGain = stats[0]?.totalPlateFormGain || 0
+        res.status(200).json({adminPercent,totalPlateFormGain:Math.round(totalGain * 100) / 100})
+    }catch(err){
+        console.error("errer calculating admin gains",err);
+        res.status(404).json({message:"Errer calculing admin gain"})
+        
+    }
+}) 

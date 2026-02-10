@@ -1,5 +1,5 @@
 import express = require("express")
-import {registerUser,loginUser,getMe, checkAllSellersStatus, refreshStripeOnboarding, editSellerProfile, getAllUsers, deleteUser, getAllSellers, editStatusSeller}  from "../controllers/userController"
+import {registerUser,loginUser,getMe, checkAllSellersStatus, refreshStripeOnboarding, editSellerProfile, getAllUsers, deleteUser, getAllSellers, editStatusSeller, filterBuyerSellers}  from "../controllers/userController"
 import { adminOnly, protect } from "../middleware/authMiddleware"
 const router = express.Router()
 router.post("/register",registerUser)
@@ -12,4 +12,5 @@ router.get("/getAllUsers",protect,adminOnly,getAllUsers)
 router.delete("/deleteUser/:userIdToDelete",protect,adminOnly,deleteUser)
 router.get("/getAllSellers",protect,adminOnly,getAllSellers)
 router.patch("/editStatusSeller/:SellerId",protect,adminOnly,editStatusSeller)
+router.get("/filterUsers",protect,adminOnly,filterBuyerSellers)
 export default router

@@ -43,3 +43,6 @@ npm install stripe
 npm install nodemailer
 
 npm install --save-dev @types/nodemailer
+
+ npm i pdfkit
+ npm i --save-dev @types/pdfkit
