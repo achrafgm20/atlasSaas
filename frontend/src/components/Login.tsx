@@ -44,8 +44,16 @@ function Login() {
         const user = result.user || result;
         const token = result.token || result.access_token;
         login(user, token);
+         if(user.role === 'Admin'){
+          navigate('/admin/dashboard');
+        }else if (user.role === 'Seller'){
+          navigate('/dashboard');
+        }else{
+          navigate('/')
+        }
         setError(null);
-        navigate('/dashboard');
+        
+       
       }
     }catch(error){
       console.error('Error logging in:', error);

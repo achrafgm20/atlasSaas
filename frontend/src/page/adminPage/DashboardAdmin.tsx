@@ -7,7 +7,7 @@ import SideBarAdmin from './components/SideBarAdmin';
 
 
 export default function DashboardAdmin() {
-  const {user } = UseAuth();
+  const {user ,logout} = UseAuth();
 
   return (
     <>
@@ -29,6 +29,7 @@ export default function DashboardAdmin() {
                   Admin - {user?.name || 'Admin'}
                 </span>
               </h2>
+              <button onClick={logout} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer">Logout</button>
             </div>
           </header>
           
