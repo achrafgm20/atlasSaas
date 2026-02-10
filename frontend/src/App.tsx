@@ -67,7 +67,7 @@ function App() {
       </Route>
       {/* admin Routess */}
        {/* element={<AdminRoute />} */}
-      <Route>
+      <Route  element={<AdminRoute />}>
         <Route path='/admin' element={<DashboardAdmin />}>
           <Route path='/admin/BuyerSellerPage' element={<BuyerSellerPage />} />
           <Route path='/admin/OrdersAdmin' element={<OrdersAdmin />} />

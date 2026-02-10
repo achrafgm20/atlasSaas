@@ -21,7 +21,7 @@ const SideBarAdmin = () => {
   ];
 
   return (
-    <aside className=" h-screen w-60 bg-white border-r border-gray-200 flex flex-col">
+    <aside className=" h-auto w-60 bg-white border-r border-gray-200 flex flex-col">
       {/* Logo Header */}
       <div className="p-5 border-b border-gray-200">
         <div className="flex items-center gap-3">
@@ -48,7 +48,7 @@ const SideBarAdmin = () => {
               className={`
                 flex items-center gap-3 px-5 py-3 text-sm font-medium transition-all border-l-3
                 ${isActive 
-                  ? 'bg-purple-50 text-blue-700 border-blue-700' 
+                  ? 'bg-blue-50 text-blue-700 border-blue-700' 
                   : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-transparent'
                 }
               `}
