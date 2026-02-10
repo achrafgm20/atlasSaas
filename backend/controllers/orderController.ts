@@ -3,6 +3,7 @@ import  asyncHandler  from 'express-async-handler';
 import User from '../models/userModel';
 import Order from '../models/ordersModel';
 import dotenv = require("dotenv")
+import PDFDocument from "pdfkit"
 dotenv.config()
 import Stripe from 'stripe';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
@@ -49,7 +50,7 @@ export const getAllBuyerOrders = asyncHandler(async(req:Request,res:Response) =>
             res.status(403).json({message:"this buyer is not exist "})
             return 
         }
-        const orders = await Order.find({buyer:buyerId,status:"paid"}).populate({path:"items.sellerId",select:"name email"})
+        const orders = await Order.find({buyer:buyerId}).populate({path:"items.sellerId",select:"name email"})
         const orderPayementDetails = await Promise.all(orders.map(async (or) => {
             let paymenetDetails = null
             if(or.stripePayementIntentIdf){
@@ -142,3 +143,158 @@ export const editOrderStatus = asyncHandler(async(req:Request,res:Response) => {
     await order.save()
     res.status(200).json({message:`order status updated succc to ${status}`,order})
 })
+
+
+
+
+
+// export const generateInvoice = asyncHandler(async(req:Request,res:Response) => {
+//     try {
+//         const {orderId} = req.params
+//         const order = await Order.findById(orderId).populate("items.productId")
+//         if(!order){
+//             res.status(404).json({message:"order nott found"})
+//             return
+             
+//         }
+//         const doc = new PDFDocument({size:"A4",margin:50})
+//         res.setHeader("Content-Type","application/pdf");
+//         res.setHeader("Content-Disposition",`attachment; filename=invoice-${orderId}.pdf`);
+//         doc.pipe(res);
+//         doc.fontSize(20).text("Invoice",275,50,{align:"right"})
+//         doc.fontSize(10).text(`Order ID : ${order?._id}`,{align:"right"}).text(`Date : ${(order as any).createdAt.toDateString()}`,{align:"right"}).moveDown()
+//         doc.fontSize(12).text("Product",50).text("Price",400).text("Total",520).moveDown()
+//         order?.items.forEach((it:any) => {
+//             doc
+//             .text(it.productName,50)
+//             .text(`$${it.price}`,400)
+//             .moveDown()            
+//         })
+//         const totalAmount = order?.items.reduce((sum:number,item:any) => sum + item.price,0)
+//         doc.fontSize(14).text(`Total: $${totalAmount}`,{align:"right"})
+//         doc.end()
+
+//     }catch(err){
+//         console.error(err);
+//         res.status(500).json({ message: 'Failed to generate invoice' });
+//     }
+// })
+
+
+
+
+export const generateInvoice = asyncHandler(async (req: Request, res: Response) => {
+  try {
+    const { orderId } = req.params;
+    const order = await Order.findById(orderId).populate("items.productId");
+
+    if (!order) {
+      res.status(404).json({ message: "Order not found" });
+      return;
+    }
+
+    const doc = new PDFDocument({ size: "A4", margin: 50 });
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader(
+      "Content-Disposition",
+      `attachment; filename=invoice-${orderId}.pdf`
+    );
+    doc.pipe(res);
+
+    // ================= HEADER =================
+    doc
+      .image("path/to/logo.png", 50, 45, { width: 120 }) // optional: company logo
+      .fontSize(20)
+      .text("AtlasTech", 200, 50, { align: "right" })
+      .fontSize(10)
+      .text(`Order ID: ${order._id}`, { align: "right" })
+      .text(`Date: ${(order as any).createdAt.toDateString()}`, {
+        align: "right",
+      })
+      .moveDown();
+
+    doc
+      .fillColor("#444444")
+      .fontSize(20)
+      .text("Invoice", 50, 150);
+
+    // ================= BILLING INFO =================
+    doc
+      .fontSize(10)
+      .text("Billing Address:", 50, 200)
+      .text(order.billingAddress?.line1 || "", 50, 215)
+      .text(order.billingAddress?.line2 || "", 50, 230)
+      .text(
+        `${order.billingAddress?.city || ""}, ${order.billingAddress?.country || ""} ${order.billingAddress?.postal_code || ""}`,
+        50,
+        245
+      )
+      .moveDown();
+
+    // ================= TABLE HEADER =================
+    const tableTop = 300;
+    const itemX = 50;
+    const priceX = 350;
+    const totalX = 450;
+
+    doc
+      .fontSize(12)
+      .fillColor("black")
+    //   .text("Product", itemX, tableTop, { bold: true })
+      .text("Price", priceX, tableTop)
+      .text("Total", totalX, tableTop);
+
+    // Draw line under header
+    doc.moveTo(50, tableTop + 20).lineTo(550, tableTop + 20).stroke();
+
+    // ================= TABLE ROWS =================
+    let i = 0;
+    const rowHeight = 25;
+    order.items.forEach((item: any, idx: number) => {
+      const y = tableTop + 30 + i * rowHeight;
+
+      // alternate row background color
+      if (i % 2 === 0) {
+        doc.rect(50, y - 5, 500, rowHeight).fill("#f5f5f5").fillColor("black");
+      }
+
+      doc
+        .fillColor("black")
+        .fontSize(10)
+        .text(item.productName, itemX, y)
+        .text(`$${item.price}`, priceX, y)
+        .text(`$${item.price}`, totalX, y);
+
+      i++;
+    });
+
+    // ================= TOTAL =================
+    const totalAmount = order.items.reduce(
+      (sum: number, item: any) => sum + item.price,
+      0
+    );
+
+    doc
+      .fontSize(14)
+      .fillColor("black")
+      .text(`Total: $${totalAmount}`, totalX, tableTop + 30 + i * rowHeight + 20, {
+        align: "right",
+      });
+
+    // ================= FOOTER =================
+    doc
+      .fontSize(10)
+      .fillColor("gray")
+      .text(
+        "Thank you for your purchase! If you have any questions, contact us at support@atlastech.com",
+        50,
+        750,
+        { align: "center", width: 500 }
+      );
+
+    doc.end();
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Failed to generate invoice" });
+  }
+});
