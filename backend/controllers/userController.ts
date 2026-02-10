@@ -279,3 +279,23 @@ export const editStatusSeller = asyncHandler(async(req:Request,res:Response) => 
 })
 
 
+export const filterBuyerSellers = asyncHandler(async(req:Request,res:Response) => {
+    const {search,role,status} = req.query
+    const filter:any  ={}
+    if(role){
+        filter.role = role
+    } 
+    if(status){
+        filter.statutCompte = {$regex:`^${status}$`,$options:"i"}
+    }
+    if(search){
+        filter.$or = [
+            {name:{$regex:search as string , $options :"i"}},
+            {email:{$regex:search as string , $options:"i"}}
+        ]
+    }
+    const users = await User.find(filter).select("-password")
+    res.status(200).json(users)
+})
+
+
