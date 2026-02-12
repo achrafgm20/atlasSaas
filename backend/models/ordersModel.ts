@@ -43,7 +43,7 @@ const orderSchema = new Schema<IOrder>({
     items:[orderItemSchema] ,
     totalAmount:{type:Number,required:true},
     stripeSessionId:{type:String,required:true},
-    status:{type:String,enum: ["pending", "paid", "shipped", "delivered", "cancelled", "failed"],default:"pending"},
+    status:{type:String,enum: ["pending", "paid", "delivered"],default:"pending"},
      shippingAddress: {
         city: String,
         country: String,

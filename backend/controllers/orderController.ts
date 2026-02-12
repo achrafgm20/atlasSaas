@@ -20,9 +20,9 @@ export const getSellerOrders = asyncHandler(async(req:Request,res:Response) =>{
         const limit = Number(req.query.limit) || 10
         const skip = (page - 1) * limit
         //chaneg if sttais = paid
-        const totalOrders = await Order.countDocuments({"items.sellerId":sellerId})
+        const totalOrders = await Order.countDocuments({"items.sellerId":sellerId,status:{$in:["paid","delivered"]}})
         //chnange if status paid
-        const orders = await Order.find({"items.sellerId":sellerId}).populate({path:"buyer",select:"name"})
+        const orders = await Order.find({"items.sellerId":sellerId,status:{$in:["paid","delivered"]}}).populate({path:"buyer",select:"name"})
                                 .sort({createdAt:-1})
                                 .skip(skip)
                                 .limit(limit)
@@ -121,7 +121,7 @@ export const getDetailsOrderSeller = asyncHandler(async(req:Request,res:Response
 
 
 export const getAllOders = asyncHandler(async(req:Request,res:Response) => {
-    const orders = await Order.find().populate("buyer","name email").populate("items.sellerId","name email")
+    const orders = await Order.find({status:{$in:["paid","delivered"]}}).populate("buyer","name email").populate("items.sellerId","name email")
     res.status(200).json({message:"all orders fetched succufly",orders})
 })
 
@@ -130,7 +130,7 @@ export const editOrderStatus = asyncHandler(async(req:Request,res:Response) => {
     const {orderId} = req.params
     const {status} = req.body
 
-    const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled", "failed"]
+    const allowedStatuses = ["pending", "paid", "delivered"]
     if(!status || !allowedStatuses.includes(status)){
         res.status(400).json("Invalid status value")
         return 
