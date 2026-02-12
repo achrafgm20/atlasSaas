@@ -147,8 +147,8 @@ export default function VendorApprovals() {
         
         {/* Page Header */}
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Vendor Approvals</h1>
-          <p className="text-sm text-gray-500 mt-1">Review and approve new vendor registration requests</p>
+          <h1 className="text-2xl font-bold text-gray-900">Seller Approved</h1>
+          <p className="text-sm text-gray-500 mt-1">Review and approve new Seller registration requests</p>
         </div>
 
         {/* Summary Cards */}

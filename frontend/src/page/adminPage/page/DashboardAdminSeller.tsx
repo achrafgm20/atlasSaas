@@ -1,39 +1,20 @@
-import { useEffect, useState } from "react";
+
+import AdminChart1 from '@/page/adminPage/components/AdminChart1'
+import CardUi from '../components/CardUi';
+import AdminGain from '../components/AdminGain';
+
+
 
 export default function Dashboard() {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem('token');
-
-        const res = await fetch(
-          'http://localhost:4000/api/trend/trendMonthAdmin',
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
-
-        const json = await res.json();
-        setData(json);
-
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  if (loading) return <p>Loading...</p>;
+  
 
   return (
     <div>
-      <h1>Dashboard</h1>
+      <h1 className='text-4xl font-bold p-4'>Dashboard Overview</h1>
+       <p className='px-4'>Welcome back! Here's what's happening with your platform today.</p>
+      <CardUi />
+      <AdminChart1 />
+      <AdminGain />
     </div>
   );
 }

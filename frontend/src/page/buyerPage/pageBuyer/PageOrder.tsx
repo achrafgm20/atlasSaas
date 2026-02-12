@@ -101,7 +101,7 @@ function PageOrder() {
             },
           }
         );
-        console.log(res.data.orders);
+       
         setOrders(res.data.orders || []);
       } catch (err) {
         console.error("Fetch orders error:", err);
