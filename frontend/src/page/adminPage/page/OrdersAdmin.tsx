@@ -3,9 +3,7 @@
 import  { useState, useEffect, useRef } from 'react';
 import {  Loader2, Edit, Check } from 'lucide-react';
 
-// --------------------------
-// TYPE SAFE DEFINITIONS
-// --------------------------
+
 export const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled", "failed"] as const;
 export type OrderStatus = typeof allowedStatuses[number];
 
@@ -47,7 +45,7 @@ const OrdersAdmin = () => {
   const [error, setError] = useState<string | null>(null);
   const [updatingOrderId, setUpdatingOrderId] = useState<string | null>(null);
   const [activeStatusEditId, setActiveStatusEditId] = useState<string | null>(null);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const dropdownRef = useRef<HTMLTableDataCellElement>(null);
 
   /* 
     🚨 Replace this with your actual auth logic!

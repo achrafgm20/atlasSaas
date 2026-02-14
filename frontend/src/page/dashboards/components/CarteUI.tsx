@@ -1,4 +1,4 @@
-import { Eye, Laptop, Pencil, Smartphone, Trash , BatteryCharging} from 'lucide-react'
+import { Eye, Laptop, Pencil, Smartphone, Trash, BatteryCharging } from 'lucide-react'
 import { useState } from 'react'
 import {
   AlertDialog,
@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { useNavigate } from 'react-router-dom'
 import { moneyDhForma } from '@/lib/utils'
-
+import EditProduct from './EditProduct' // Import the EditProduct component
 
 interface Product {
   _id: string
@@ -26,7 +26,13 @@ interface Product {
   images?: { url: string }[]
 }
 
-export default function CarteUI({ product, onDelete }: { product: Product, onDelete?: (id: string) => void }) {
+interface CarteUIProps {
+  product: Product
+  onDelete?: (id: string) => void
+  onProductUpdated?: () => void // Add this prop for refreshing after edit
+}
+
+export default function CarteUI({ product, onDelete, onProductUpdated }: CarteUIProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false)
   const [isDeleting, setIsDeleting] = useState(false)
   const navigate = useNavigate()
@@ -56,7 +62,6 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
       const token = localStorage.getItem('token')
       
       if (!token) {
-        
         setIsDeleting(false)
         return
       }
@@ -79,22 +84,23 @@ export default function CarteUI({ product, onDelete }: { product: Product, onDel
       }
       setShowDeleteDialog(false)
     } catch (error: unknown) {
-      console.log(error.message)
+      console.log((error as Error).message)
     } finally {
       setIsDeleting(false)
     }
     navigate('/dashboard/seller')
   }
-  
-const handEdite = async () => {
-  console.log("Edit product");
-}
 
-
+  // Handle product update callback
+  const handleProductUpdated = () => {
+    if (onProductUpdated) {
+      onProductUpdated()
+    }
+  }
 
   return (
     <>
-      <div className="flex flex-col justify-between  p-2 shadow-md bg-white hover:shadow-xl rounded-xl">
+      <div className="flex flex-col justify-between p-2 shadow-md bg-white hover:shadow-xl rounded-xl">
         <div className='relative'>
           <div className='flex justify-center items-center h-64 w-full bg-gray-50 rounded-lg overflow-hidden'>
             <img 
@@ -130,21 +136,29 @@ const handEdite = async () => {
           {/* Action Buttons */}
           <div className='flex gap-2 pt-2'>
             <button 
-              onClick={()=> navigate(`/dashboard/ProductPageSeller/${product._id}`)}
+              onClick={() => navigate(`/dashboard/ProductPageSeller/${product._id}`)}
               className='flex-1 flex items-center justify-center gap-2 bg-blue-50 cursor-pointer text-blue-600 px-4 py-2.5 rounded-xl hover:bg-blue-100 transition-colors duration-200'
               aria-label="View product"
             >
               <Eye size={18} />
               <span className='hidden xl:inline text-sm'>View</span>
             </button>
-            <button 
-              onClick={() => handEdite()}
-              className='flex-1 flex items-center justify-center gap-2 bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200'
-              aria-label="Edit product"
-            >
-              <Pencil size={18} />
-              <span className='hidden xl:inline text-sm'>Edit</span>
-            </button>
+            
+            {/* Edit Button with EditProduct Component */}
+            <EditProduct 
+              productId={product._id}
+              onProductUpdated={handleProductUpdated}
+              triggerElement={
+                <button 
+                  className='flex-1 flex items-center justify-center gap-2 bg-gray-50 text-gray-700 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-colors duration-200 cursor-pointer'
+                  aria-label="Edit product"
+                >
+                  <Pencil size={18} />
+                  <span className='hidden xl:inline text-sm'>Edit</span>
+                </button>
+              }
+            />
+            
             <button 
               onClick={() => setShowDeleteDialog(true)}
               className='cursor-pointer flex-1 flex items-center justify-center gap-2 bg-red-50 text-red-600 px-4 py-2.5 rounded-xl hover:bg-red-100 transition-colors duration-200'
