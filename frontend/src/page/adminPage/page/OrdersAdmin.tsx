@@ -4,7 +4,7 @@ import  { useState, useEffect, useRef } from 'react';
 import {  Loader2, Edit, Check } from 'lucide-react';
 
 
-export const allowedStatuses = ["pending", "paid", "shipped", "delivered", "cancelled", "failed"] as const;
+export const allowedStatuses = ["pending", "paid",  "delivered",] as const;
 export type OrderStatus = typeof allowedStatuses[number];
 
 interface Buyer {
@@ -152,10 +152,7 @@ const OrdersAdmin = () => {
     switch (status) {
       case 'pending': return 'bg-orange-100 text-orange-700';
       case 'paid': return 'bg-blue-100 text-blue-700';
-      case 'shipped': return 'bg-purple-100 text-purple-700';
       case 'delivered': return 'bg-green-100 text-green-700';
-      case 'cancelled': return 'bg-red-100 text-red-700';
-      case 'failed': return 'bg-amber-100 text-amber-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   }
@@ -166,13 +163,13 @@ const OrdersAdmin = () => {
   // Auto calculating stats, updates automatically when status changes
   const totalOrders = orders.length;
   const pendingCount = orders.filter(o => o.status === 'pending').length;
-  const shippedCount = orders.filter(o => o.status === 'shipped').length;
+  const paidCount = orders.filter(o => o.status === 'paid').length;
   const deliveredCount = orders.filter(o => o.status === 'delivered').length;
 
   const stats = [
     { label: 'Total Orders', value: totalOrders, sub: '+23% this month', color: 'text-slate-900' },
     { label: 'Pending', value: pendingCount, sub: '', color: 'text-orange-500' },
-    { label: 'Shipped', value: shippedCount, sub: '', color: 'text-blue-600' },
+    { label: 'paid', value: paidCount, sub: '', color: 'text-blue-600' },
     { label: 'Delivered', value: deliveredCount, sub: '', color: 'text-green-600' },
   ]
 

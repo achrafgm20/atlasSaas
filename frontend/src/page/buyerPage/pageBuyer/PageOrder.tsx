@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Clock, Truck, XCircle, AlertCircle , Package, Calendar, CreditCard, CheckCircle, ChevronDown, ChevronUp, Loader, BanknoteArrowUp } from 'lucide-react';
+import { Clock, AlertCircle , Package, Calendar, CreditCard, CheckCircle, ChevronDown, ChevronUp, Loader, BanknoteArrowUp, CircleX } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
 import Invoice from '../components/Invoice';
 
@@ -55,25 +55,10 @@ const orderStatusStyle = (status: string): OrderStatusStyle => {
         color: 'bg-yellow-100 text-yellow-800',
         icon: Clock
       };
-    case 'shipped':
-      return {
-        color: 'bg-blue-100 text-blue-800',
-        icon: Truck
-      };
     case 'delivered':
       return {
         color: 'bg-purple-100 text-purple-800',
         icon: CheckCircle
-      };
-    case 'cancelled':
-      return {
-        color: 'bg-orange-100 text-orange-800',
-        icon: XCircle
-      };
-    case 'failed':
-      return {
-        color: 'bg-red-100 text-red-800',
-        icon: AlertCircle
       };
     default:
       return {
@@ -285,7 +270,8 @@ return (
                             <p className="text-sm font-semibold text-gray-800">
                               Stripe Payment
                             </p>
-                            <Invoice id={order._id} />
+                            {(order.status === "paid" || order.status === "delivered") && <Invoice id={order._id} />}
+                            
                           </div>
                           
                           <div className="pb-3 border-b">
@@ -315,8 +301,9 @@ return (
                           
                           <div className="pt-2">
                             <div className="flex items-center gap-2 text-green-600">
-                              <CheckCircle size={20} />
-                              <span className="font-semibold">Payment Successful</span>
+                              {(order.status === "paid" || order.status === "delivered") ? <><CheckCircle size={20} />
+                              <span className="font-semibold">Payment Successful</span></> :<><CircleX  size={20} className="text-red-700"/><span className="font-semibold text-red-700">Payment Failed</span></> }
+                              
                             </div>
                           </div>
                         </div>
