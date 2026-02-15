@@ -105,7 +105,7 @@ export const loginUser = asyncHandler (async (req:Request,res:Response) => {
     const {email,password} = req.body 
     const user = await User.findOne({email})
     if(user && user.password && (await bcrypt.compare(password,user.password as string))){
-        res.json({
+        res.status(200).json({
             _id : user._id ,
             name : user.name ,
             email:user.email ,
