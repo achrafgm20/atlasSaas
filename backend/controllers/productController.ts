@@ -229,39 +229,120 @@ export const deleteProduct = asyncHandler(async (req:Request,res:Response):Promi
 
 
 
-export const editProduct = asyncHandler(async(req:Request,res:Response) => {
-    try{
-        const {id} = req.params
-        const {productName,battery,category,color,condition,costPrice,description,listingPrice,status,storage} = req.body
-        const product = await Product.findById(id)
-        if(!product){
-            res.status(404).json({message:"product not found "})
-            return 
-        }
-        const sellerId = req.user as string 
-        const sellerExist = await User.findById(sellerId)
-        if(!sellerExist || sellerExist.role !== "Seller"){
-            res.status(403).json({message:"Only seller with this product can edit this product"})
-            return 
-        }
-        if (productName) product.productName = productName;
-        if (battery) product.battery = battery;
-        if (category) product.category = category;
-        if (color) product.color = color;
-        if (condition) product.condition = condition;
-        if (costPrice) product.costPrice = costPrice;
-        if (description) product.description = description;
-        if (listingPrice) product.listingPrice = listingPrice;
-        if (status) product.status = status;
-        if (storage) product.storage = storage;
-        await product.save()
-        res.status(200).json({product,message:"product edit successfully"})
-    }catch(err:any){
-        console.error("failed editing product ",err.message);
-        res.status(404).json({message:"failed editing product",error:err.message})
+// export const editProduct = asyncHandler(async(req:Request,res:Response) => {
+//     try{
+//         const {id} = req.params
+//         const {productName,battery,category,color,condition,costPrice,description,listingPrice,status,storage} = req.body
+//         const product = await Product.findById(id)
+//         if(!product){
+//             res.status(404).json({message:"product not found "})
+//             return 
+//         }
+//         const sellerId = req.user as string 
+//         const sellerExist = await User.findById(sellerId)
+//         if(!sellerExist || sellerExist.role !== "Seller"){
+//             res.status(403).json({message:"Only seller with this product can edit this product"})
+//             return 
+//         }
+//         if (productName) product.productName = productName;
+//         if (battery) product.battery = battery;
+//         if (category) product.category = category;
+//         if (color) product.color = color;
+//         if (condition) product.condition = condition;
+//         if (costPrice) product.costPrice = costPrice;
+//         if (description) product.description = description;
+//         if (listingPrice) product.listingPrice = listingPrice;
+//         if (status) product.status = status;
+//         if (storage) product.storage = storage;
+//         await product.save()
+//         res.status(200).json({product,message:"product edit successfully"})
+//     }catch(err:any){
+//         console.error("failed editing product ",err.message);
+//         res.status(404).json({message:"failed editing product",error:err.message})
         
+//     }
+// })
+
+
+export const editProduct = asyncHandler(async(req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const {
+      productName,
+      battery,
+      category,
+      color,
+      condition,
+      costPrice,
+      description,
+      listingPrice,
+      status,
+      storage
+    } = req.body;
+
+    const product = await Product.findById(id);
+    if (!product) {
+       res.status(404).json({ message: "Product not found" });
+       return
     }
-})
+
+    const sellerId = req.user as string;
+
+    if (product.seller.toString() !== sellerId) {
+       res.status(403).json({ message: "You can only edit your own product" });
+       return
+    }
+
+    // ✅ Update fields safely
+    if (productName !== undefined) product.productName = productName;
+    if (battery !== undefined) product.battery = battery;
+    if (category !== undefined) product.category = category;
+    if (color !== undefined) product.color = color;
+    if (condition !== undefined) product.condition = condition;
+    if (costPrice !== undefined) product.costPrice = costPrice;
+    if (description !== undefined) product.description = description;
+    if (listingPrice !== undefined) product.listingPrice = listingPrice;
+    if (status !== undefined) product.status = status;
+    if (storage !== undefined) product.storage = storage;
+
+    // ✅ Handle single image upload
+    const files = req.files as Express.Multer.File[] | undefined;
+
+if (files && files.length > 0) {
+  for (const file of files) {
+    const uploadResult: UploadApiResponse = await new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: "products" },
+        (err, result) => {
+          if (err) reject(err);
+          else resolve(result!);
+        }
+      );
+      stream.end(file.buffer);
+    });
+
+    product.images.push({
+      url: uploadResult.secure_url,
+      public_id: uploadResult.public_id
+    });
+  }
+}
+
+
+    await product.save();
+
+    res.status(200).json({
+      message: "Product updated successfully",
+      product
+    });
+
+  } catch (err: any) {
+    res.status(500).json({
+      message: "Failed editing product",
+      error: err.message
+    });
+  }
+});
 
 
 export const replaceImage = asyncHandler(async(req:Request,res:Response) => {

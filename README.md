@@ -46,3 +46,13 @@ npm install --save-dev @types/nodemailer
 
  npm i pdfkit
  npm i --save-dev @types/pdfkit
+
+
+ npm install --save-dev jest supertest  mongodb-memory-server
+
+
+
+npm install --save-dev ts-jest @types/jest
+npx ts-jest config:init
+
+npm install --save-dev jest
