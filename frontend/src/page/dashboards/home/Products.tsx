@@ -6,13 +6,20 @@ import StartCards from "../components/StartCards";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Loading from "../components/Loading";
-import { UseAuth } from "@/context/AuthContext";
 import PendingApproval from "../components/PendingApproval";
 
 interface Product {
   _id: string;
   productName: string;
   listingPrice: number;
+}
+
+interface User {
+  _id: string;
+  name?: string;
+  email?: string;
+  statutCompte?: string;
+  [key: string]: any;
 }
 
 type ProductsResponse = {
@@ -28,18 +35,20 @@ export interface Filters {
 
 const getProducts = async (filters?: Filters): Promise<Product[]> => {
   const token = localStorage.getItem("token");
-  
+
   let url = "http://localhost:4000/api/product";
-  
-  // If filters exist, use filter endpoint, otherwise use regular endpoint
+
   if (filters && Object.keys(filters).length > 0) {
     const params = new URLSearchParams();
-    
+
     if (filters.keyword) params.append("keyword", filters.keyword);
-    if (filters.category) params.append("category", filters.category.toUpperCase());
-    if (filters.minPrice !== undefined) params.append("minPrice", filters.minPrice.toString());
-    if (filters.maxPrice !== undefined) params.append("maxPrice", filters.maxPrice.toString());
-    
+    if (filters.category)
+      params.append("category", filters.category.toUpperCase());
+    if (filters.minPrice !== undefined)
+      params.append("minPrice", filters.minPrice.toString());
+    if (filters.maxPrice !== undefined)
+      params.append("maxPrice", filters.maxPrice.toString());
+
     url = `http://localhost:4000/api/product/filterProductSeller?${params.toString()}`;
   } else {
     url = "http://localhost:4000/api/product/getSellerProduct";
@@ -54,12 +63,44 @@ const getProducts = async (filters?: Filters): Promise<Product[]> => {
   return response.data.products;
 };
 
+const fetchCurrentUser = async (): Promise<User | null> => {
+  const token = localStorage.getItem("token");
+
+  if (!token) return null;
+
+  try {
+    const response = await axios.get<User>("http://localhost:4000/api/users/me", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching current user:", error);
+    return null;
+  }
+};
+
 export default function ProductsPage() {
-  const { user, fetchUser } = UseAuth();
+  const [user, setUser] = useState<User | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
+  const [userLoading, setUserLoading] = useState(true);
   const [currentFilters, setCurrentFilters] = useState<Filters>({});
   const [showPendingModal, setShowPendingModal] = useState(false);
+
+  const fetchUser = async () => {
+    setUserLoading(true);
+    try {
+      const currentUser = await fetchCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error("Error fetching user:", error);
+    } finally {
+      setUserLoading(false);
+    }
+  };
 
   const fetchProducts = async (filters?: Filters) => {
     setLoading(true);
@@ -79,33 +120,29 @@ export default function ProductsPage() {
   };
 
   const handleAddProductClick = () => {
-    // Check if user status is pending
     if (user?.statutCompte === "Pending") {
       setShowPendingModal(true);
     }
-    // If approved, FormBtn will handle the action
   };
 
   useEffect(() => {
+    fetchUser();
     fetchProducts();
-    if (!user) {
-      fetchUser(); // Fetch user if token exists but user data is missing
-    }
-  }, [user]);
+  }, []);
 
   console.log(user);
 
-  if (loading) return <Loading text="Fetching products..." />;
+  if (userLoading || loading) return <Loading text="Fetching data..." />;
 
   return (
     <div className="w-auto space-y-6">
-      {/* Show Pending Approval Modal */}
-      {showPendingModal && <PendingApproval onClose={() => setShowPendingModal(false)} />}
+      {showPendingModal && (
+        <PendingApproval onClose={() => setShowPendingModal(false)} />
+      )}
 
       <div className="flex justify-between items-center">
         <h1>Products Page</h1>
-        
-        {/* Show different UI based on account status */}
+
         {user?.statutCompte === "Approved" ? (
           <FormBtn onProductAdded={() => fetchProducts(currentFilters)} />
         ) : user?.statutCompte === "Pending" ? (
@@ -127,11 +164,11 @@ export default function ProductsPage() {
       </div>
 
       <StartCards products={products} />
-      
+
       <div className="flex gap-8">
         <FilterPanel onFilterChange={handleFilterChange} />
       </div>
-      
+
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
         {products.length === 0 ? (
           <div className="col-span-full text-center py-12">
@@ -139,7 +176,7 @@ export default function ProductsPage() {
               No Products Yet
             </h2>
             <p className="text-gray-500">
-              {user?.statutCompte === "Pending" 
+              {user?.statutCompte === "Pending"
                 ? "Your account is pending approval. Once approved, you can add products."
                 : "Welcome! You have 0 products. Click 'Add Product' to get started."}
             </p>
