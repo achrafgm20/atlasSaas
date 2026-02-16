@@ -121,7 +121,7 @@ export const getDetailsOrderSeller = asyncHandler(async(req:Request,res:Response
 
 
 export const getAllOders = asyncHandler(async(req:Request,res:Response) => {
-    const orders = await Order.find({status:{$in:["paid","delivered"]}}).populate("buyer","name email").populate("items.sellerId","name email")
+    const orders = await Order.find().populate("buyer","name email").populate("items.sellerId","name email")
     res.status(200).json({message:"all orders fetched succufly",orders})
 })
 
