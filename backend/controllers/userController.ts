@@ -7,92 +7,188 @@ import Stripe from 'stripe';
 import message from '../models/message';
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!)
 // function register 
-export const registerUser = asyncHandler(async (req:Request,res:Response) => {
-    const {name,email,password,role,statutCompte} = req.body 
-    if(!name  || !email || !password || !role ) {
-        res.status(400).json("remplir tous les champs")
-        return 
-    }
-    const userExist = await User.findOne({email})
-    if(userExist) {
-        res.status(400).json("user has alredy exist ")
-        return 
-    }
-    const salt = await bcrypt.genSalt(10)
-    const hashedPassword = await bcrypt.hash(password,salt)
-    const user = await User.create({
-        name,email,password:hashedPassword,role,statutCompte
-    })
-    if(!user){
-        res.status(404).json({message:"User creating failed"})
-        return
-    }
-    if(role === "Seller"){
-        try{
-            const stripeAccount = await stripe.accounts.create({
-            type:"express",
-            country:"US",
-            email:user.email,
-            capabilities: {
-        card_payments: { requested: true },
-        transfers: { requested: true } // ✅ This is what's missing!
-    },
-    business_type: 'individual'
-        })
+// export const registerUser = asyncHandler(async (req:Request,res:Response) => {
+//     const {name,email,password,role,statutCompte} = req.body 
+//     if(!name  || !email || !password || !role ) {
+//         res.status(400).json("remplir tous les champs")
+//         return 
+//     }
+//     const userExist = await User.findOne({email})
+//     if(userExist) {
+//         res.status(400).json("user has alredy exist ")
+//         return 
+//     }
+//     const salt = await bcrypt.genSalt(10)
+//     const hashedPassword = await bcrypt.hash(password,salt)
+//     const user = await User.create({
+//         name,email,password:hashedPassword,role,statutCompte
+//     })
+//     if(!user){
+//         res.status(404).json({message:"User creating failed"})
+//         return
+//     }
+//     if(role === "Seller"){
+//         try{
+//             const stripeAccount = await stripe.accounts.create({
+//             type:"express",
+//             country:"US",
+//             email:user.email,
+//             capabilities: {
+//         card_payments: { requested: true },
+//         transfers: { requested: true } // ✅ This is what's missing!
+//     },
+//     business_type: 'individual'
+//         })
        
-        user.stripeAccountId = stripeAccount.id
+//         user.stripeAccountId = stripeAccount.id
         
 
-       const accountLink = await stripe.accountLinks.create({
-    account: stripeAccount.id,
-    refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${user._id}`, // ✅ Add userId
-    return_url: `${process.env.CLIENT_URL}/dashboard/settings`,
-    type: "account_onboarding",
-})
-        user.stripeAccountId = stripeAccount.id;
-        user.stripeOnboardingUrl = accountLink.url;
-        user.stripeOnboardingCompleted = false;
-        user.canReceiveTransfers = false;
-        user.transfersCapability = "inactive";
-        await user.save();
-        res.status(201).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            statutCompte: user.statutCompte,
-            token: generateToken(user._id?.toString() as string),
-            stripeAccountId: user.stripeAccountId,
-            stripeOnboardingUrl: user.stripeOnboardingUrl,
-            stripeOnboardingCompleted: user.stripeOnboardingCompleted,
-            canReceiveTransfers: user.canReceiveTransfers,
-            transfersCapability: user.transfersCapability
-        })
-        return
-        }catch(err:any){
-            console.error("error creating stripe account ",err);
+//        const accountLink = await stripe.accountLinks.create({
+//     account: stripeAccount.id,
+//     refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${user._id}`, // ✅ Add userId
+//     return_url: `${process.env.CLIENT_URL}/dashboard/settings`,
+//     type: "account_onboarding",
+// })
+//         user.stripeAccountId = stripeAccount.id;
+//         user.stripeOnboardingUrl = accountLink.url;
+//         user.stripeOnboardingCompleted = false;
+//         user.canReceiveTransfers = false;
+//         user.transfersCapability = "inactive";
+//         await user.save();
+//         res.status(201).json({
+//             _id: user._id,
+//             name: user.name,
+//             email: user.email,
+//             role: user.role,
+//             statutCompte: user.statutCompte,
+//             token: generateToken(user._id?.toString() as string),
+//             stripeAccountId: user.stripeAccountId,
+//             stripeOnboardingUrl: user.stripeOnboardingUrl,
+//             stripeOnboardingCompleted: user.stripeOnboardingCompleted,
+//             canReceiveTransfers: user.canReceiveTransfers,
+//             transfersCapability: user.transfersCapability
+//         })
+//         return
+//         }catch(err:any){
+//             console.error("error creating stripe account ",err);
             
-        }
-        return 
+//         }
+//         return 
         
     
     
-    }
+//     }
 
-    res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      role: user.role,
-      statutCompte: user.statutCompte,
-      token: generateToken(user._id?.toString() as string),
+//     res.status(201).json({
+//       _id: user._id,
+//       name: user.name,
+//       email: user.email,
+//       role: user.role,
+//       statutCompte: user.statutCompte,
+//       token: generateToken(user._id?.toString() as string),
 
-    })   
+//     })   
     
 
 
 
-})
+// })
+
+
+export const registerUser = asyncHandler(async (req: Request, res: Response) => {
+    const { name, email, password, role, statutCompte } = req.body;
+    
+    if (!name || !email || !password || !role) {
+        res.status(400).json({ message: "Fill all fields" });
+        return;
+    }
+    
+    const userExist = await User.findOne({ email });
+    if (userExist) {
+        res.status(400).json({ message: "User already exists" });
+        return;
+    }
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+    
+    const user = await User.create({
+        name,
+        email,
+        password: hashedPassword,
+        role,
+        statutCompte
+    });
+    
+    if (!user) {
+        res.status(404).json({ message: "User creation failed" });
+        return;
+    }
+    
+    if (role === "Seller") {
+        try {
+            // Create Stripe account
+            const stripeAccount = await stripe.accounts.create({
+                type: "express",
+                country: "US",
+                email: user.email,
+                capabilities: {
+                    card_payments: { requested: true },
+                    transfers: { requested: true }
+                },
+                business_type: 'individual'
+            });
+            
+            user.stripeAccountId = stripeAccount.id;
+            
+            // Create onboarding link
+            const accountLink = await stripe.accountLinks.create({
+                account: stripeAccount.id,
+                refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${user._id}`,
+                // return_url: `${process.env.CLIENT_URL}/dashboard/settings`, // ✅ They return here
+                return_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${user._id}`, // 🔥 CHANGED: Backend URL instead of frontend
+                type: "account_onboarding",
+            });
+            
+            user.stripeOnboardingUrl = accountLink.url;
+            user.stripeOnboardingCompleted = false;
+            user.canReceiveTransfers = false;
+            user.transfersCapability = "inactive";
+            
+            await user.save();
+            
+            res.status(201).json({
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+                statutCompte: user.statutCompte,
+                token: generateToken(user._id?.toString() as string),
+                stripeAccountId: user.stripeAccountId,
+                stripeOnboardingUrl: user.stripeOnboardingUrl,
+                stripeOnboardingCompleted: user.stripeOnboardingCompleted,
+                canReceiveTransfers: user.canReceiveTransfers,
+                transfersCapability: user.transfersCapability
+            });
+            return;
+            
+        } catch (err: any) {
+            console.error("Error creating Stripe account:", err);
+            res.status(500).json({ message: "Error creating Stripe account" });
+            return;
+        }
+    }
+    
+    // For Buyers
+    res.status(201).json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        statutCompte: user.statutCompte,
+        token: generateToken(user._id?.toString() as string),
+    });
+});
 
 
 // function generate jwt 
@@ -202,6 +298,33 @@ export const checkAllSellersStatus = asyncHandler(async(req: Request, res: Respo
 });
 
 
+// export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Response) => {
+//     const userId = req.query.userId as string; 
+    
+//     if (!userId) {
+//         res.status(400).json({ message: "User ID missing" });
+//         return;
+//     }
+
+//     const user = await User.findById(userId);
+    
+//     if (!user?.stripeAccountId) {
+//         res.status(404).json({ message: "Stripe account not found" });
+//         return;
+//     }
+
+//     const accountLink = await stripe.accountLinks.create({
+//         account: user.stripeAccountId,
+//         refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${userId}`, // ✅ Pass userId again
+//         return_url: `${process.env.CLIENT_URL}/dashboard/settings`,
+//         type: "account_onboarding",
+//     });
+
+//     // Redirect directly to the new onboarding URL
+//     res.redirect(accountLink.url);
+// });
+
+
 export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Response) => {
     const userId = req.query.userId as string; 
     
@@ -217,17 +340,57 @@ export const refreshStripeOnboarding = asyncHandler(async (req: Request, res: Re
         return;
     }
 
+    // 🔥 AUTO-SYNC: Check Stripe account status when user returns
+    try {
+        console.log("🔄 Auto-syncing Stripe account for:", user.email);
+        
+        const account = await stripe.accounts.retrieve(user.stripeAccountId);
+        
+        console.log("📊 Account status from Stripe:", {
+            details_submitted: account.details_submitted,
+            transfers: account.capabilities?.transfers
+        });
+        
+        // Update database with current Stripe status
+        user.stripeDetailsSubmitted = account.details_submitted;
+        user.stripeOnboardingCompleted = account.details_submitted;
+        user.canReceiveTransfers = 
+            account.capabilities?.transfers === "active" && account.details_submitted;
+        user.transfersCapability = account.capabilities?.transfers || "inactive";
+        user.statutCompte = 
+            account.details_submitted && account.capabilities?.transfers === "active"
+                ? "Approved" : "Pending";
+        
+        await user.save();
+        
+        console.log("✅ User auto-synced successfully:", user.email);
+        
+        // If onboarding is complete, redirect to dashboard
+        if (account.details_submitted) {
+            console.log("✅ Onboarding complete - redirecting to settings");
+            res.redirect(`${process.env.CLIENT_URL}/dashboard/settings`);
+            return;
+        }
+        
+        // If not complete, create new onboarding link
+        console.log("⚠️ Onboarding incomplete - creating new link");
+        
+    } catch (err: any) {
+        console.error("❌ Error auto-syncing account:", err.message);
+        // Continue to create new onboarding link even if sync fails
+    }
+
+    // Create new onboarding link if needed
     const accountLink = await stripe.accountLinks.create({
         account: user.stripeAccountId,
-        refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${userId}`, // ✅ Pass userId again
+        refresh_url: `${process.env.BACKEND_URL}/api/users/seller/onboarding/refresh?userId=${userId}`,
         return_url: `${process.env.CLIENT_URL}/dashboard/settings`,
         type: "account_onboarding",
     });
 
-    // Redirect directly to the new onboarding URL
+    // Redirect to onboarding
     res.redirect(accountLink.url);
 });
-
 
 
 
@@ -299,3 +462,42 @@ export const filterBuyerSellers = asyncHandler(async(req:Request,res:Response) =
 })
 
 
+
+
+
+
+
+export const manualSyncStripe = asyncHandler(async(req: Request, res: Response) => {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email, role: "Seller" });
+    
+    if (!user || !user.stripeAccountId) {
+        res.status(404).json({ message: "Seller not found" });
+        return;
+    }
+    
+    console.log("🔍 Fetching account from Stripe:", user.stripeAccountId);
+    
+    const account = await stripe.accounts.retrieve(user.stripeAccountId);
+    
+    console.log("Account status:", {
+        details_submitted: account.details_submitted,
+        transfers: account.capabilities?.transfers
+    });
+    
+    user.stripeDetailsSubmitted = account.details_submitted;
+    user.stripeOnboardingCompleted = account.details_submitted;
+    user.canReceiveTransfers = 
+        account.capabilities?.transfers === "active" && account.details_submitted;
+    user.transfersCapability = account.capabilities?.transfers || "inactive";
+    user.statutCompte = 
+        account.details_submitted && account.capabilities?.transfers === "active"
+            ? "Approved" : "Pending";
+    
+    await user.save();
+    
+    console.log("✅ User synced:", user.email);
+    
+    res.status(200).json({ message: "Synced successfully", user });
+});

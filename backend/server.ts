@@ -35,6 +35,9 @@ app.use(cors({
     credentials: true
 }))
 
+app.use("/api/checkout/webhook",express.raw({type:"application/json"}),webhookRouter)
+
+
 // const uploadsPath = path.join(__dirname, "uploads");
 
 // if (!fs.existsSync(uploadsPath)) {
@@ -42,7 +45,6 @@ app.use(cors({
 //   console.log("📁 uploads folder created");
 // }
 
-app.use("/api/checkout/webhook",express.raw({type:"application/json"}),webhookRouter)
 
 app.use(express.json())
 app.use("/api/users",router)
