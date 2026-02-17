@@ -35,16 +35,7 @@ export default function PaymentSuccess() {
             Your payment has been processed successfully
           </p>
           
-          {/* <div className="bg-gray-50 rounded-lg p-6 mb-8">
-            <div className="flex justify-between items-center mb-3">
-              <span className="text-gray-600">Order Number</span>
-              <span className="font-semibold text-gray-900">{orderNumber}</span>
-            </div>
-            <div className="flex justify-between items-center">
-              <span className="text-gray-600">Amount Paid</span>
-              <span className="font-semibold text-gray-900 text-lg">{amount}</span>
-            </div>
-          </div> */}
+        
           
           <div className="space-y-3">
             <button

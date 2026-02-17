@@ -9,7 +9,7 @@ const Cart = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  const handleRemoveItem = async (productId) => {
+  const handleRemoveItem = async (productId : PRODUCT) => {
     await deleteFromCart(productId);
   };
 
@@ -95,7 +95,7 @@ const Cart = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Product List */}
         <div className="lg:col-span-2 space-y-4">
-          {cart.products.map((item) => (
+          {cart.products.map((item ) => (
             <div key={item._id} className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm flex items-center gap-4">
               <div className="w-36 h-36 bg-gray-50 rounded-xl overflow-hidden">
                 {item.product.images && item.product.images.length > 0 ? (

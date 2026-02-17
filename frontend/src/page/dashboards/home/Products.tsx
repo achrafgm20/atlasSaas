@@ -254,8 +254,8 @@ export default function ProductsPage() {
           </div>
         ) : (
           <>
-            {products.map((product) => (
-              <CarteUI key={product._id} product={product} />
+            {products.map((product ) => (
+              <CarteUI key={product._id } product={product} />
             ))}
           </>
         )}

@@ -34,7 +34,7 @@ export default function PendingApproval({ onClose }: PendingApprovalProps) {
 
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 space-y-3">
           <div className="flex items-start gap-3">
-            <Shield className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <Shield className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
             <div className="text-sm text-gray-700">
               <p className="font-semibold text-blue-900 mb-1">What's happening?</p>
               <p>Our admin team is verifying your account details to ensure platform security and quality.</p>
@@ -42,7 +42,7 @@ export default function PendingApproval({ onClose }: PendingApprovalProps) {
           </div>
           
           <div className="flex items-start gap-3">
-            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+            <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 shrink-0" />
             <div className="text-sm text-gray-700">
               <p className="font-semibold text-blue-900 mb-1">What can you do?</p>
               <p>Please wait for admin approval. You'll be notified via email once your account is approved.</p>

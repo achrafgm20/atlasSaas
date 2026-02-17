@@ -6,6 +6,7 @@ import { useCart } from '@/context/CartFavContext';
 import { moneyDhForma } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 
+
 const Favorites = () => {
   const { favorites, loading, deleteFromFavorites } = useFavorite();
   const { addToCart } = useCart();
@@ -16,7 +17,7 @@ const Favorites = () => {
     await deleteFromFavorites(productId);
   };
 
-  const handleAddToCart = async (productId: string, e: React.MouseEvent) => {
+  const handleAddToCart = async (productId: any, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
     await addToCart(productId);
