@@ -114,7 +114,7 @@ const Favorites = () => {
 
                   <button
                     onClick={(e) => handleAddToCart(product._id, e)}
-                    className="flex cursor-pointer items-center gap-2 bg-gradient-to-r from-[#3b82f6] to-[#2563eb] text-white px-7 py-2.5 rounded-md font-bold text-sm shadow-lg shadow-blue-200 hover:shadow-xl transition"
+                    className="flex cursor-pointer items-center gap-2 bg-linear-to-r from-[#3b82f6] to-[#2563eb] text-white px-7 py-2.5 rounded-md font-bold text-sm shadow-lg shadow-blue-200 hover:shadow-xl transition"
                   >
                     <ShoppingCart size={18} />
                     <span>Add </span>

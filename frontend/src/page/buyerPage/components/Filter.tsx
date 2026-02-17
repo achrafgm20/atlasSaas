@@ -2,7 +2,7 @@ import  { useState } from 'react';
 import { Search, SlidersHorizontal, ChevronDown, RotateCcw, Check } from 'lucide-react';
 
 const Filter = () => {
-  const [showFilters, setShowFilters] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
   const [activeMenu, setActiveMenu] = useState(null);
   const [activeCategory, setActiveCategory] = useState('all'); 
   const [selectedFilters, setSelectedFilters] = useState({
@@ -119,7 +119,7 @@ const Filter = () => {
             </button>
           </div>
 
-          <div className="h-8 w-[1px] bg-gray-300 mx-2 hidden md:block"></div>
+          <div className="h-8 w-px bg-gray-300 mx-2 hidden md:block"></div>
 
           <div className="flex flex-wrap gap-3 relative">
             {Object.keys(filterOptions).map((key) => (

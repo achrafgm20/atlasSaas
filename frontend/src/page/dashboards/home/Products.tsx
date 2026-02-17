@@ -154,7 +154,7 @@ export default function ProductsPage() {
       {isApproved && !canReceiveTransfers && (
         <div className="flex items-center justify-between bg-amber-50 border border-amber-300 rounded-xl px-6 py-4 shadow-sm">
           <div className="flex items-center gap-3">
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <svg
                 className="w-6 h-6 text-amber-500"
                 fill="none"
@@ -181,7 +181,7 @@ export default function ProductsPage() {
           </div>
           <button
             onClick={() => navigate("/dashboard/settings")}
-            className="ml-4 flex-shrink-0 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
+            className="ml-4 shrink-0 px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-white text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm hover:shadow-md"
           >
             Connect Stripe Account
           </button>
