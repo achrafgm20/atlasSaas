@@ -9,8 +9,8 @@ const Cart = () => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
-  const handleRemoveItem = async (productId : PRODUCT) => {
-    await deleteFromCart(productId);
+  const handleRemoveItem = async (productId : string) => {
+    await deleteFromCart(productId as any);
   };
 
   const handleClearCart = async () => {
@@ -49,7 +49,7 @@ const Cart = () => {
           </div>
           <button 
             onClick={() => navigate('/')}
-            className="bg-[#1E3A8A] text-white px-8 py-3 rounded-full font-bold hover:bg-blue-900 transition-all"
+            className="bg-[#1E3A8A] cursor-pointer text-white px-8 py-3 rounded-full font-bold hover:bg-blue-900 transition-all"
           >
             Continue Shopping
           </button>
@@ -96,7 +96,7 @@ const Cart = () => {
         {/* Product List */}
         <div className="lg:col-span-2 space-y-4">
           {cart.products.map((item ) => (
-            <div key={item._id} className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm flex items-center gap-4">
+            <div  className="bg-white p-4 rounded-[24px] border border-gray-100 shadow-sm flex items-center gap-4">
               <div className="w-36 h-36 bg-gray-50 rounded-xl overflow-hidden">
                 {item.product.images && item.product.images.length > 0 ? (
                   <img 
@@ -129,7 +129,7 @@ const Cart = () => {
               <div className="flex items-center gap-3">
                 <span className="text-xl font-bold text-[#059669]">{moneyDhForma(item.product.listingPrice)}</span>
                 <button 
-                  onClick={() => handleRemoveItem(item.product._id)}
+                  onClick={() => handleRemoveItem(item.product._id) }
                   disabled={loading}
                   className="text-gray-300 cursor-pointer hover:text-red-500 transition-colors disabled:opacity-50"
                 >

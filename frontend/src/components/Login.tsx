@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button } from './ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { Input } from './ui/input';<a href=""></a>
+import { Input } from './ui/input';
 import { useState } from 'react';
 import { UseAuth } from '../context/AuthContext';
 
@@ -47,7 +47,7 @@ function Login() {
          if(user.role === 'Admin'){
           navigate('/admin/dashboard');
         }else if (user.role === 'Seller'){
-          navigate('/dashboard');
+          navigate('/dashboard/sales');
         }else{
           navigate('/')
         }

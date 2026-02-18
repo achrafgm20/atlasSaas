@@ -48,13 +48,14 @@ export default function FilterPanel({ onFilterChange }: FilterPanelProps) {
 
   return (
     <div className="bg-white rounded-2xl flex-wrap w-full p-5 shadow-sm">
-      <h1 className="font-bold text-2xl">Filters</h1>
+      
 
       <form className="flex flex-wrap gap-5 items-end" onSubmit={(e) => {
         e.preventDefault();
         handleApply();
       }}>
         {/* Search */}
+        <h1 className="font-bold text-2xl">Filters</h1>
         <div>
           <Label>Search</Label>
           <Input

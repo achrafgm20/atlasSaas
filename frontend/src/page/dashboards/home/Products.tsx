@@ -13,6 +13,11 @@ interface Product {
   _id: string;
   productName: string;
   listingPrice: number;
+  condition: string;
+  category: string;
+  storage: string;
+  color: string;
+  battery: string;
 }
 
 interface User {

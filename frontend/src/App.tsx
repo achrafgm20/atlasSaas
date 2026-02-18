@@ -7,7 +7,6 @@ import DashboardLayout from './page/layouts/DashboardLayout';
 import Dashboard from './page/dashboards/home/Dashboard';
 import Products from './page/dashboards/home/Products';
 import Orders from './page/dashboards/home/Orders';
-
 import SalesOverview from './page/dashboards/home/SalesOverview';
 import { AuthProvider } from './context/AuthContext';
 import SellerRoute from './page/layouts/SellerRoute';
@@ -32,11 +31,8 @@ import DashboardAdminSeller from './page/adminPage/page/DashboardAdminSeller';
 
 
 function App() {
-  
-
   return (
     <>
-    
     <BrowserRouter>
     <AuthProvider>
     <Routes>
@@ -51,7 +47,6 @@ function App() {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/PaymentSuccess' element={<PaymentSuccess />} />
         <Route path='/PaymentFailed' element={<PaymentFailed />} />
-        
       </Route>
 
       {/* Seller Routess */}
@@ -67,7 +62,6 @@ function App() {
         </Route>
       </Route>
       {/* admin Routess */}
-       {/* element={<AdminRoute />} */}
       <Route  element={<AdminRoute />}>
         <Route path='/admin' element={<DashboardAdmin />}>
           <Route path='/admin/BuyerSellerPage' element={<BuyerSellerPage />} />

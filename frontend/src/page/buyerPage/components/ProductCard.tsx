@@ -53,7 +53,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
     e.preventDefault();
     e.stopPropagation();
     console.log(product._id);
-    addToCart(product._id);
+    addToCart(product._id as any);
   };
 
   return (
