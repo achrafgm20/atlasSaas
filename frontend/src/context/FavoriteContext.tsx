@@ -1,5 +1,6 @@
 // FavoriteContext.tsx
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
 
 interface FavoriteContextType {
   favorites: any[];
@@ -14,6 +15,7 @@ interface FavoriteContextType {
 
 const FavoriteContext = createContext<FavoriteContextType | undefined>(undefined);
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useFavorite = () => {
   const context = useContext(FavoriteContext);
   if (!context) {
@@ -29,21 +31,18 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
 
   const API_BASE_URL = 'http://localhost:4000/api/favorite';
 
-  // Get token from localStorage
   const getToken = () => {
     return localStorage.getItem('token');
   };
 
-  // Get headers with token
   const getHeaders = () => {
     const token = getToken();
     return {
       'Content-Type': 'application/json',
-      ...(token && { 'Authorization': `Bearer ${token}` }),
+      ...(token && { Authorization: `Bearer ${token}` }),
     };
   };
 
-  // Get all favorites
   const getFavorites = async () => {
     setLoading(true);
     setError(null);
@@ -70,9 +69,8 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const data = await response.json();
-      
-      // Handle different API response structures
-      let favoritesArray = [];
+
+      let favoritesArray: any[] = [];
       if (Array.isArray(data)) {
         favoritesArray = data;
       } else if (Array.isArray(data.favorites)) {
@@ -82,7 +80,7 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
       } else if (data.favorite && Array.isArray(data.favorite.products)) {
         favoritesArray = data.favorite.products;
       }
-      
+
       setFavorites(favoritesArray);
     } catch (err: any) {
       setError(err.message);
@@ -93,7 +91,6 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Add product to favorites
   const addToFavorites = async (productId: string) => {
     setLoading(true);
     setError(null);
@@ -118,7 +115,6 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const data = await response.json();
-      // Refresh favorites list
       await getFavorites();
       return data;
     } catch (err: any) {
@@ -130,7 +126,6 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Delete product from favorites
   const deleteFromFavorites = async (productId: string) => {
     setLoading(true);
     setError(null);
@@ -154,7 +149,6 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
       }
 
       const data = await response.json();
-      // Refresh favorites list
       await getFavorites();
       return data;
     } catch (err: any) {
@@ -166,25 +160,22 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  // Check if product is in favorites
   const isFavorite = (productId: string) => {
     if (!Array.isArray(favorites) || favorites.length === 0) {
       return false;
     }
-    
-    return favorites.some(item => 
-      (item._id === productId) || 
-      (item.product?._id === productId) ||
-      (item.productId === productId)
+    return favorites.some(
+      (item) =>
+        item._id === productId ||
+        item.product?._id === productId ||
+        item.productId === productId
     );
   };
 
-  // Get favorite count
   const getFavoriteCount = () => {
     return Array.isArray(favorites) ? favorites.length : 0;
   };
 
-  // Load favorites on mount only if token exists
   useEffect(() => {
     const token = getToken();
     if (token) {
@@ -192,7 +183,7 @@ export const FavoriteProvider = ({ children }: { children: ReactNode }) => {
     }
   }, []);
 
-  const value = {
+  const value: FavoriteContextType = {
     favorites,
     loading,
     error,
