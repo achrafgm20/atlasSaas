@@ -5,31 +5,30 @@ import * as z from "zod";
 import { Save, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { UseAuth } from "@/context/AuthContext";
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-  phone?: string;
-  storeName?: string;
-  storeDescription?: string;
-  Country?: string;
-  city?: string;
-  postalCode?: string;
-  adresse?: string;
-  
-  statutCompte?: boolean;
-  stripeOnboardingUrl?: string;
-  stripeAccountId?: string;
-  stripeOnboardingCompleted?: boolean;
-  
-  canReceiveTransfers?: boolean;
-  onboardingComplete?: boolean;
-  transfersActive?: boolean;
-  canReceiveMoney?: boolean;
-  stripeDetailsSubmitted?: boolean;
-}
+// interface User {
+//   id: string;
+//   name: string;
+//   email: string;
+//   role: string;
+//   phone?: string;
+//   storeName?: string;
+//   storeDescription?: string;
+//   Country?: string;
+//   city?: string;
+//   postalCode?: string;
+//   adresse?: string;
+
+//   statutCompte?: boolean;
+//   stripeOnboardingUrl?: string;
+//   stripeAccountId?: string;
+//   stripeOnboardingCompleted?: boolean;
+
+//   canReceiveTransfers?: boolean;
+//   onboardingComplete?: boolean;
+//   transfersActive?: boolean;
+//   canReceiveMoney?: boolean;
+//   stripeDetailsSubmitted?: boolean;
+// }
 
 // Validation schema
 const profileSchema = z.object({
@@ -82,9 +81,7 @@ export default function Settings() {
       console.log("User data:", user);
       console.log("Stripe URL:", user.stripeOnboardingUrl);
       console.log("Stripe Completed:", user.stripeOnboardingCompleted);
-      
-      // Update form values with actual user data
-      // Adjust these field mappings based on your actual user object structure
+
       form.reset({
         fullName: user.name || "",
         email: user.email || "",
@@ -105,29 +102,32 @@ export default function Settings() {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       if (!token) {
         throw new Error("No authentication token found");
       }
 
-      const response = await fetch("http://localhost:4000/api/users/editSellerProfile", {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: data.fullName,
-          email: data.email,
-          phone: data.phone,
-          storeName: data.storeName,
-          storeDescription: data.storeDescription,
-          Country: data.Country,
-          city: data.city,
-          postalCode: data.postalCode,
-          adresse: data.adresse,
-        }),
-      });
+      const response = await fetch(
+        "http://localhost:4000/api/users/editSellerProfile",
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: data.fullName,
+            email: data.email,
+            phone: data.phone,
+            storeName: data.storeName,
+            storeDescription: data.storeDescription,
+            Country: data.Country,
+            city: data.city,
+            postalCode: data.postalCode,
+            adresse: data.adresse,
+          }),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -136,19 +136,20 @@ export default function Settings() {
 
       const result = await response.json();
       console.log("Profile updated:", result);
-      
+
       setUpdateSuccess(true);
-      
+
       // Refresh user data
       await fetchUser();
-      
+
       // Clear success message after 3 seconds
       setTimeout(() => setUpdateSuccess(false), 3000);
-      
     } catch (error) {
       console.error("Error updating profile:", error);
-      setUpdateError(error instanceof Error ? error.message : "Failed to update profile");
-      
+      setUpdateError(
+        error instanceof Error ? error.message : "Failed to update profile"
+      );
+
       // Clear error message after 5 seconds
       setTimeout(() => setUpdateError(null), 5000);
     }
@@ -166,7 +167,8 @@ export default function Settings() {
   };
 
   // Determine if Stripe is connected based on API data
-  const isStripeConnected = user?.stripeOnboardingCompleted && user?.stripeDetailsSubmitted;
+  const isStripeConnected =
+    user?.stripeOnboardingCompleted && user?.stripeDetailsSubmitted;
 
   if (isLoading) {
     return (
@@ -189,7 +191,7 @@ export default function Settings() {
           </p>
         </div>
       )}
-      
+
       {updateError && (
         <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
           <p className="flex items-center">
@@ -223,7 +225,9 @@ export default function Settings() {
                   {...form.register(field.name as keyof ProfileFormValues)}
                   className="w-full border rounded px-3 py-2"
                 />
-                {form.formState.errors[field.name as keyof ProfileFormValues] && (
+                {form.formState.errors[
+                  field.name as keyof ProfileFormValues
+                ] && (
                   <p className="text-red-500 text-sm">
                     {
                       form.formState.errors[
@@ -305,13 +309,18 @@ export default function Settings() {
               : "Loading..."}
           </button>
 
-          {/* Debug info - remove in production */}
-          {process.env.NODE_ENV === 'development' && user && (
+          {/* Debug info - only shown in development */}
+          {import.meta.env.DEV && user && (
             <div className="mt-4 p-2 bg-gray-100 rounded text-xs">
               <p>Debug Info:</p>
-              <p>Account ID: {user.stripeAccountId || 'None'}</p>
-              <p>Onboarding Complete: {String(user.stripeOnboardingCompleted)}</p>
-              <p>Details Submitted: {String(user.stripeDetailsSubmitted)}</p>
+              <p>Account ID: {user.stripeAccountId || "None"}</p>
+              <p>
+                Onboarding Complete:{" "}
+                {String(user.stripeOnboardingCompleted)}
+              </p>
+              <p>
+                Details Submitted: {String(user.stripeDetailsSubmitted)}
+              </p>
               <p>Can Receive: {String(user.canReceiveTransfers)}</p>
             </div>
           )}
