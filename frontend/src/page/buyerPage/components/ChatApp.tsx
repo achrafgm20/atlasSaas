@@ -15,7 +15,7 @@ interface ChatAppProps {
 }
 
 const ChatApp = ({ productId }: ChatAppProps) => {
-  const {user} = UseAuth()
+  const {user } = UseAuth()
   const [comments, setComments] = useState<Message[]>([]);
   const [message, setMessage] = useState("");
   const [discussionId, setDiscussionId] = useState<string | null>(null);
@@ -185,9 +185,9 @@ const ChatApp = ({ productId }: ChatAppProps) => {
             <p>No comments yet. Be the first to comment!</p>
           </div>
         ) : (
-          comments.map((c) => (
+          comments.map((c : any) => (
             <div key={c._id} className="flex gap-4">
-              <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+              <div className="h-10 w-10 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold shrink-0">
                 {typeof c.sender === "object" && c.sender?.name
                   ? c.sender.name.charAt(0).toUpperCase()
                   : "U"}
@@ -209,7 +209,7 @@ const ChatApp = ({ productId }: ChatAppProps) => {
                       : ""}
                   </span>
                 </div>
-                <div className={c.sender?.name == user.name ?"bg-blue-200 p-3 rounded-2xl border shadow-sm" :"bg-white p-3 rounded-2xl border shadow-sm"}>
+                <div className={c.sender?.name == user?.name as string ?"bg-blue-200 p-3 rounded-2xl border shadow-sm" :"bg-white p-3 rounded-2xl border shadow-sm"}>
                   <p className="text-sm text-gray-700">{c.content}</p>
                 </div>
               </div>
@@ -222,7 +222,7 @@ const ChatApp = ({ productId }: ChatAppProps) => {
       {/* Input */}
       <div className="p-4 border-t bg-white">
         <div className="flex items-center gap-3">
-          <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold flex-shrink-0">
+          <div className="h-8 w-8 rounded-full bg-indigo-500 flex items-center justify-center text-white font-semibold shrink-0">
             U
           </div>
 

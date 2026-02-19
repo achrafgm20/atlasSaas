@@ -266,7 +266,7 @@ export function NotificationDropdown() {
       {isOpen && (
         <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-xl shadow-2xl border border-gray-100 z-20 overflow-hidden">
           {/* Header */}
-          <div className="px-4 py-3 bg-gradient-to-r from-blue-600 to-blue-400 flex justify-between items-center">
+          <div className="px-4 py-3 bg-linear-to-r from-blue-600 to-blue-400 flex justify-between items-center">
             <div className="flex items-center space-x-2">
               <h3 className="text-lg font-semibold text-white">Notifications</h3>
               {/* Connection indicator */}

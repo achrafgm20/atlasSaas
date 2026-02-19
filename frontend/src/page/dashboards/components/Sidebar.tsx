@@ -4,7 +4,6 @@ import {
   Package,
   ShoppingCart,
   MessageSquare,
-  BarChart3,
   LogOut,
   UserCog,
   Menu,
@@ -22,11 +21,11 @@ function Sidebar() {
     const [isCollapsed, setIsCollapsed] = useState(true);
     
     const navItems = [
-      { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/seller' },
+      { name: 'Dashboard', icon: LayoutDashboard, path: '/dashboard/sales' },
       { name: 'Products', icon: Package, path: '/dashboard/products' },
       { name: 'Orders', icon: ShoppingCart, path: '/dashboard/orders' },
       { name: 'Notifications', icon: MessageSquare, path: '/dashboard/Notifications'},
-      { name: 'Sales Overview', icon: BarChart3, path: '/dashboard/sales' },
+      
       {name: 'Settings', icon: UserCog, path: '/dashboard/settings'}
     ];
 

@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "recharts": "^3.7.0"
   },
   "devDependencies": {
     "@types/multer": "^2.0.0",

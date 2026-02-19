@@ -15,7 +15,8 @@ function PaymentResult() {
         await new Promise(resolve => setTimeout(resolve, 2000));
         // Mock response - change to "failed" to test error state
         setStatus("failed");
-      } catch (err :unknown) {
+      } catch (err: any) {
+        console.log(err)
         setStatus("failed");
       }
     };

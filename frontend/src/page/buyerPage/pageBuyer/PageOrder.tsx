@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { Package, Calendar, CreditCard, CheckCircle, ChevronDown, ChevronUp, Loader } from 'lucide-react';
+import { Clock, AlertCircle , Package, Calendar, CreditCard, CheckCircle, ChevronDown, ChevronUp, Loader, BanknoteArrowUp, CircleX } from 'lucide-react';
 import axios, { AxiosError } from 'axios';
+import Invoice from '../components/Invoice';
 
 // Type definitions
 interface Seller {
@@ -34,9 +35,37 @@ interface Order {
   };  
   __v: number;
 }
-
+type OrderStatusStyle = {
+  color: string;
+  icon: any;
+};
 interface OrdersResponse {
   orders: Order[];
+}
+
+const orderStatusStyle = (status: string): OrderStatusStyle => {
+  switch (status) {
+    case 'paid':
+      return {
+        color: 'bg-green-100 text-green-800',
+        icon: BanknoteArrowUp
+      };
+    case 'pending':
+      return {
+        color: 'bg-yellow-100 text-yellow-800',
+        icon: Clock
+      };
+    case 'delivered':
+      return {
+        color: 'bg-purple-100 text-purple-800',
+        icon: CheckCircle
+      };
+    default:
+      return {
+        color: 'bg-gray-100 text-gray-800',
+        icon: AlertCircle
+      };
+  }
 }
 
 function PageOrder() {
@@ -57,7 +86,7 @@ function PageOrder() {
             },
           }
         );
-        console.log(res.data.orders);
+       
         setOrders(res.data.orders || []);
       } catch (err) {
         console.error("Fetch orders error:", err);
@@ -109,22 +138,22 @@ function PageOrder() {
     );
   }
 
-  if (orders.length === 0) {
-    return (
-      <div className="min-h-screen bg-gray-50 p-4 md:p-8">
-        <div className="max-w-6xl mx-auto">
-          <h1 className="text-3xl font-bold mb-8 text-gray-800">My Orders</h1>
-          <div className="bg-white rounded-lg shadow-md p-12 text-center">
-            <Package size={64} className="mx-auto text-gray-300 mb-4" />
-            <h2 className="text-2xl font-semibold text-gray-600 mb-2">No Orders Yet</h2>
-            <p className="text-gray-500">You haven't placed any orders. Start shopping to see your orders here!</p>
-          </div>
+if (orders.length === 0) {
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-3xl font-bold mb-8 text-gray-800">My Orders</h1>
+        <div className="bg-white rounded-lg shadow-md p-12 text-center">
+          <Package size={64} className="mx-auto text-gray-300 mb-4" />
+          <h2 className="text-2xl font-semibold text-gray-600 mb-2">No Orders Yet</h2>
+          <p className="text-gray-500">You haven't placed any orders. Start shopping to see your orders here!</p>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
+}
 
-  return (
+return (
     <div className="min-h-screen bg-gray-50 p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         <div className="mb-8">
@@ -133,7 +162,9 @@ function PageOrder() {
         </div>
         
         <div className="space-y-4">
-          {orders.map((order: Order) => (
+          {orders.map((order: Order) => {
+            const { color, icon: Icon } = orderStatusStyle(order.status);
+            return (
             <div key={order._id} className="bg-white rounded-lg shadow-md overflow-hidden">
               {/* Order Header */}
               <div 
@@ -144,14 +175,12 @@ function PageOrder() {
                   <div className="flex-1">
                     <div className="flex items-center gap-3 mb-2">
                       <h3 className="text-lg font-bold text-gray-800">Order #{order._id.slice(-8).toUpperCase()}</h3>
-                      <span className={`px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 ${
-                        order.status === 'paid' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        <CheckCircle size={18} />
-                        {order.status === 'paid' ? 'Payment Completed' : order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                      <span className={`px-3 py-1 rounded-full text-sm font-semibold flex items-center gap-1 ${color}`}>
+                        <Icon size={18} />
+                        {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                        
                       </span>
+                      
                     </div>
                     
                     <div className="flex flex-wrap gap-4 text-sm text-gray-600">
@@ -241,17 +270,19 @@ function PageOrder() {
                             <p className="text-sm font-semibold text-gray-800">
                               Stripe Payment
                             </p>
+                            {(order.status === "paid" || order.status === "delivered") && <Invoice id={order._id} />}
+                            
                           </div>
                           
                           <div className="pb-3 border-b">
                             <p className="text-xs text-gray-500 mb-1">Adress Billing</p>
-                            <p className="text-sm font-mono text-gray-700 break-all">
+                            <div className="text-sm font-mono text-gray-700 break-all space-y-1">
                               <p>{order.billingAddress?.city}</p>
                               <p>{order.billingAddress?.line1}</p>
                               <p>{order.billingAddress?.line2}</p>
                               <p>{order.billingAddress?.postal_code}</p>
                               <p>{order.billingAddress?.country}</p>
-                            </p>
+                            </div>
                           </div>
                           
                           {order.stripeAccountId && (
@@ -270,8 +301,9 @@ function PageOrder() {
                           
                           <div className="pt-2">
                             <div className="flex items-center gap-2 text-green-600">
-                              <CheckCircle size={20} />
-                              <span className="font-semibold">Payment Successful</span>
+                              {(order.status === "paid" || order.status === "delivered") ? <><CheckCircle size={20} />
+                              <span className="font-semibold">Payment Successful</span></> :<><CircleX  size={20} className="text-red-700"/><span className="font-semibold text-red-700">Payment Failed</span></> }
+                              
                             </div>
                           </div>
                         </div>
@@ -281,7 +313,8 @@ function PageOrder() {
                 </div>
               )}
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>

@@ -1,26 +1,32 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { useNavigate } from "react-router-dom";
 import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL = "http://localhost:4000";
 
-// Interface matching backend data structure
+// ✅ UPDATED: Interface matching your ACTUAL backend data
 interface Notification {
   _id: string;
   title: string;
   body: string;
   type: "order" | "message";
   isRead: boolean;
-  link: string;
   user: string;
+  targetId: string;        // product ID or order ID
+  targetType: string;      // "product" or "order"
+  conversationId?: string; // conversation/discussion ID (for messages)
   createdAt: string;
   updatedAt: string;
+  __v?: number;
 }
 
 interface SocketNotification {
   type: "message" | "order";
   title: string;
   body: string;
-  discussionId?: string;
+  targetId?: string;
+  targetType?: string;
+  conversationId?: string;
 }
 
 type FilterType = "all" | "unread" | "read";
@@ -54,17 +60,15 @@ function NotificationIcon({ type }: { type: Notification["type"] }) {
     ),
   };
 
-  const typeClass = iconClasses[type];
-  const icon = icons[type];
-
   return (
-    <div className={`h-10 w-10 rounded-full flex items-center justify-center ${typeClass}`}>
-      {icon}
+    <div
+      className={`h-10 w-10 rounded-full flex items-center justify-center ${iconClasses[type]}`}
+    >
+      {icons[type]}
     </div>
   );
 }
 
-// Format date to relative time or date string
 function formatDate(dateString: string): { time: string; date: string } {
   const date = new Date(dateString);
   const now = new Date();
@@ -93,13 +97,16 @@ function formatDate(dateString: string): { time: string; date: string } {
   } else if (diffDays === 1) {
     dateStr = "Yesterday";
   } else {
-    dateStr = date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
+    dateStr = date.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
   }
 
   return { time, date: dateStr };
 }
 
-// Connection status indicator component
 function ConnectionStatus({ isConnected }: { isConnected: boolean }) {
   return (
     <div className="flex items-center space-x-2">
@@ -115,7 +122,6 @@ function ConnectionStatus({ isConnected }: { isConnected: boolean }) {
   );
 }
 
-// Toast notification component for real-time notifications
 function NotificationToast({
   notification,
   onClose,
@@ -200,8 +206,8 @@ export function Notifications() {
   const [userId, setUserId] = useState<string | null>(null);
   const [isConnected, setIsConnected] = useState(false);
 
-  // Socket ref to persist across renders
   const socketRef = useRef<Socket | null>(null);
+  const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
 
@@ -220,23 +226,22 @@ export function Notifications() {
   // Handle real-time notifications
   const handleRealtimeNotification = useCallback(
     (socketNotif: SocketNotification) => {
-      // Create a new notification object
       const newNotification: Notification = {
         _id: `temp-${Date.now()}`,
         title: socketNotif.title,
         body: socketNotif.body,
         type: socketNotif.type,
         isRead: false,
-        link: socketNotif.discussionId ? `/seller/discussion/${socketNotif.discussionId}` : "",
         user: userId || "",
+        targetId: socketNotif.targetId || "",
+        targetType: socketNotif.targetType || "",
+        conversationId: socketNotif.conversationId || "",
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       };
 
-      // Add to notifications list
       setNotifications((prev) => [newNotification, ...prev]);
 
-      // Show toast
       setToastNotification({
         title: socketNotif.title,
         body: socketNotif.body,
@@ -248,15 +253,10 @@ export function Notifications() {
 
   // Initialize socket connection
   useEffect(() => {
-    if (!token) {
-      return;
-    }
+    if (!token) return;
 
-    // Create socket connection
     const socket = io(SOCKET_URL, {
-      auth: {
-        token: token,
-      },
+      auth: { token },
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: 5,
@@ -265,15 +265,11 @@ export function Notifications() {
 
     socketRef.current = socket;
 
-    // Socket event handlers
     socket.on("connect", () => {
       console.log("Socket connected:", socket.id);
       setIsConnected(true);
-
-      // Join user room when connected
       if (userId) {
         socket.emit("joinUserRoom", userId);
-        console.log("Joined user room:", userId);
       }
     });
 
@@ -282,8 +278,8 @@ export function Notifications() {
       setIsConnected(false);
     });
 
-    socket.on("connect_error", (error) => {
-      console.error("Socket connection error:", error.message);
+    socket.on("connect_error", (err) => {
+      console.error("Socket connection error:", err.message);
       setIsConnected(false);
     });
 
@@ -292,18 +288,15 @@ export function Notifications() {
       handleRealtimeNotification(notification);
     });
 
-    // Cleanup on unmount
     return () => {
       socket.disconnect();
       socketRef.current = null;
     };
   }, [token, userId, handleRealtimeNotification]);
 
-  // Join user room when userId changes and socket is connected
   useEffect(() => {
     if (socketRef.current?.connected && userId) {
       socketRef.current.emit("joinUserRoom", userId);
-      console.log("Joined user room:", userId);
     }
   }, [userId]);
 
@@ -322,16 +315,14 @@ export function Notifications() {
           }
         );
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch notifications");
-        }
+        if (!response.ok) throw new Error("Failed to fetch notifications");
 
         const data = await response.json();
-        console.log(data);
-        setNotifications(data.notifications || []);
-        setLoading(false);
+        console.log("Fetched notifications:", data);
+        setNotifications(data.notifications || data || []);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An error occurred");
+      } finally {
         setLoading(false);
       }
     };
@@ -347,13 +338,10 @@ export function Notifications() {
     return true;
   });
 
-  // Group notifications by date
   const groupedNotifications = filteredNotifications.reduce(
     (groups, notification) => {
       const { date } = formatDate(notification.createdAt);
-      if (!groups[date]) {
-        groups[date] = [];
-      }
+      if (!groups[date]) groups[date] = [];
       groups[date].push(notification);
       return groups;
     },
@@ -361,19 +349,34 @@ export function Notifications() {
   );
 
   const markAsRead = async (id: string) => {
-    setNotifications(notifications.map((n) => (n._id === id ? { ...n, isRead: true } : n)));
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
+    );
+
+    // ✅ Also mark as read on the backend
+    try {
+      await fetch(`http://localhost:4000/api/notification/markAsRead/${id}`, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+    } catch (err) {
+      console.error("Failed to mark notification as read on server:", err);
+    }
   };
 
   const markAsUnread = async (id: string) => {
-    setNotifications(notifications.map((n) => (n._id === id ? { ...n, isRead: false } : n)));
+    setNotifications((prev) =>
+      prev.map((n) => (n._id === id ? { ...n, isRead: false } : n))
+    );
   };
 
   const toggleSelect = (id: string) => {
-    if (selectedNotifications.includes(id)) {
-      setSelectedNotifications(selectedNotifications.filter((sid) => sid !== id));
-    } else {
-      setSelectedNotifications([...selectedNotifications, id]);
-    }
+    setSelectedNotifications((prev) =>
+      prev.includes(id) ? prev.filter((sid) => sid !== id) : [...prev, id]
+    );
   };
 
   const selectAll = () => {
@@ -384,20 +387,63 @@ export function Notifications() {
     }
   };
 
+  // =====================================================
+  //  ✅ HANDLE NOTIFICATION CLICK (clicking the body)
+  // =====================================================
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification._id);
-    if (notification.link) {
-      window.location.href = notification.link;
+    navigateToTarget(notification);
+  };
+
+  // =====================================================
+  //  ✅ HANDLE VIEW DETAILS CLICK
+  // =====================================================
+  const handleViewDetails = (notification: Notification, event: React.MouseEvent) => {
+    event.stopPropagation();
+    markAsRead(notification._id);
+    navigateToTarget(notification);
+  };
+
+  // =====================================================
+  //  ✅ CENTRAL NAVIGATION LOGIC
+  //  Based on notification.type and notification.targetId
+  // =====================================================
+  const navigateToTarget = (notification: Notification) => {
+    switch (notification.type) {
+      case "order":
+        // Order notification → go to orders page
+        // If you want to highlight a specific order, you can append the targetId
+        if (notification.targetId) {
+          navigate(`/dashboard/orders?orderId=${notification.targetId}`);
+        } else {
+          navigate("/dashboard/orders");
+        }
+        break;
+
+      case "message":
+        // Message notification → go to the product page using targetId
+        if (notification.targetId) {
+          navigate(`/dashboard/ProductPageSeller/${notification.targetId}`);
+        } else {
+          console.warn("Message notification has no targetId:", notification);
+          navigate("/dashboard");
+        }
+        break;
+
+      default:
+        console.warn("Unknown notification type:", notification.type);
+        navigate("/dashboard");
+        break;
     }
   };
 
   const markAllAsRead = () => {
-    setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
+    setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
   };
 
   const markSelectedAsRead = () => {
-    setNotifications(
-      notifications.map((n) =>
+    setNotifications((prev) =>
+      prev.map((n) =>
         selectedNotifications.includes(n._id) ? { ...n, isRead: true } : n
       )
     );
@@ -447,7 +493,6 @@ export function Notifications() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Toast for real-time notifications */}
       <NotificationToast
         notification={toastNotification}
         onClose={() => setToastNotification(null)}
@@ -591,7 +636,9 @@ export function Notifications() {
                                 <div className="flex-1">
                                   <p
                                     className={`text-sm font-medium ${
-                                      !notification.isRead ? "text-gray-900" : "text-gray-700"
+                                      !notification.isRead
+                                        ? "text-gray-900"
+                                        : "text-gray-700"
                                     }`}
                                   >
                                     {notification.title}
@@ -599,12 +646,26 @@ export function Notifications() {
                                   <p className="text-sm text-gray-500 mt-1 line-clamp-2">
                                     {notification.body}
                                   </p>
-                                  <p className="text-xs text-gray-400 mt-2">{time}</p>
+
+                                  {/* ✅ Show type badge for clarity */}
+                                  <div className="flex items-center space-x-2 mt-2">
+                                    <span
+                                      className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                                        notification.type === "message"
+                                          ? "bg-blue-100 text-blue-700"
+                                          : "bg-green-100 text-green-700"
+                                      }`}
+                                    >
+                                      {notification.type === "message"
+                                        ? "💬 Message"
+                                        : "📦 Order"}
+                                    </span>
+                                    <p className="text-xs text-gray-400">{time}</p>
+                                  </div>
                                 </div>
 
-                                {/* Unread indicator */}
                                 {!notification.isRead && (
-                                  <div className="flex-shrink-0 ml-4">
+                                  <div className="shrink-0 ml-4">
                                     <div className="h-2.5 w-2.5 rounded-full bg-blue-500"></div>
                                   </div>
                                 )}
@@ -628,14 +689,16 @@ export function Notifications() {
                                   Mark as read
                                 </button>
                               )}
-                              {notification.link && (
-                                <a
-                                  href={notification.link}
-                                  className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
-                                >
-                                  View details →
-                                </a>
-                              )}
+
+                              {/* ✅ UPDATED: View details navigates based on type */}
+                              <button
+                                onClick={(e) => handleViewDetails(notification, e)}
+                                className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
+                              >
+                                {notification.type === "message"
+                                  ? "View product →"
+                                  : "View order →"}
+                              </button>
                             </div>
                           </div>
                         </div>

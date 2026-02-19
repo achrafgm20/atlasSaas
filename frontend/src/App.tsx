@@ -7,7 +7,6 @@ import DashboardLayout from './page/layouts/DashboardLayout';
 import Dashboard from './page/dashboards/home/Dashboard';
 import Products from './page/dashboards/home/Products';
 import Orders from './page/dashboards/home/Orders';
-
 import SalesOverview from './page/dashboards/home/SalesOverview';
 import { AuthProvider } from './context/AuthContext';
 import SellerRoute from './page/layouts/SellerRoute';
@@ -22,15 +21,18 @@ import Settings from './page/dashboards/home/Settings';
 import PaymentSuccess from './page/buyerPage/components/PaymentSuccess';
 import PaymentFailed from './page/buyerPage/components/PaymentFailed';
 import Notifications from './page/dashboards/home/Notifications';
-import DashboardAdmin from './page/adminPage/page/DashboardAdmin';
+import DashboardAdmin from './page/adminPage/DashboardAdmin';
+import AdminRoute from './page/adminPage/AdminRoute';
+import BuyerSellerPage from './page/adminPage/page/BuyerSellerPage';
+import OrdersAdmin from './page/adminPage/page/OrdersAdmin';
+import SellerAproval from './page/adminPage/page/SellerAproval';
+import DashboardAdminSeller from './page/adminPage/page/DashboardAdminSeller';
+
 
 
 function App() {
-  
-
   return (
     <>
-    
     <BrowserRouter>
     <AuthProvider>
     <Routes>
@@ -45,7 +47,6 @@ function App() {
         <Route path='/login' element={<LoginPage />} />
         <Route path='/PaymentSuccess' element={<PaymentSuccess />} />
         <Route path='/PaymentFailed' element={<PaymentFailed />} />
-        
       </Route>
 
       {/* Seller Routess */}
@@ -61,8 +62,13 @@ function App() {
         </Route>
       </Route>
       {/* admin Routess */}
-      <Route>
-        <Route path='/admin' element={<DashboardAdmin />} />
+      <Route  element={<AdminRoute />}>
+        <Route path='/admin' element={<DashboardAdmin />}>
+          <Route path='/admin/BuyerSellerPage' element={<BuyerSellerPage />} />
+          <Route path='/admin/OrdersAdmin' element={<OrdersAdmin />} />
+          <Route path='/admin/SellerAproval' element={<SellerAproval />} />
+          <Route path='/admin/dashboard' element={<DashboardAdminSeller />} />
+        </Route>
       </Route>
       {/* Error page */}
       <Route path="*" element={<ErrorPage />} />

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, NavLink } from "react-router-dom";
 import logo from '../assets/logoAtlas.png';
-import { Box, Heart, ShoppingCart, Boxes, Menu, X } from 'lucide-react';
+import { Box, Heart, ShoppingCart, Boxes, Menu, X ,UserStar} from 'lucide-react';
 import { UseAuth } from '@/context/AuthContext';
 import UserIdNav from "./UserIdNav";
 import { useFavorite } from "@/context/FavoriteContext";
@@ -19,7 +19,8 @@ function NavBar() {
     { id: 1, title: 'All Products', link: "/", icon: Box, roles: ['Buyer', 'Seller'] },
     { id: 2, title: 'Favorites', link: "/Favorites", icon: Heart, roles: ['Buyer'] },
     { id: 3, title: 'Cart', link: "/Cart", icon: ShoppingCart, roles: ['Buyer'] },
-    { id: 4, title: 'Order', link: "/Order", icon: Boxes, roles: ['Buyer'] }
+    { id: 4, title: 'Order', link: "/Order", icon: Boxes, roles: ['Buyer'] },
+    { id: 5, title: 'Admin', link: "/admin/dashboard", icon: UserStar, roles: ['Admin'] }
   ];
 
   // Filter navigation items based on user role

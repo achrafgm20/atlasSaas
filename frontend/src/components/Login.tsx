@@ -5,7 +5,7 @@ import { Controller, useForm } from 'react-hook-form';
 import { Button } from './ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useNavigate } from 'react-router-dom';
-import { Input } from './ui/input';<a href=""></a>
+import { Input } from './ui/input';
 import { useState } from 'react';
 import { UseAuth } from '../context/AuthContext';
 
@@ -44,8 +44,16 @@ function Login() {
         const user = result.user || result;
         const token = result.token || result.access_token;
         login(user, token);
+         if(user.role === 'Admin'){
+          navigate('/admin/dashboard');
+        }else if (user.role === 'Seller'){
+          navigate('/dashboard/sales');
+        }else{
+          navigate('/')
+        }
         setError(null);
-        navigate('/dashboard');
+        
+       
       }
     }catch(error){
       console.error('Error logging in:', error);

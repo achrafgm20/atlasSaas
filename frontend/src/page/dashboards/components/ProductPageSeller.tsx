@@ -2,25 +2,24 @@ import { Button } from '@/components/ui/button';
 import { Link, useParams } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import { ArrowLeft } from 'lucide-react'; 
-import {moneyDhForma} from '@/lib/utils'
+import { ArrowLeft } from 'lucide-react';
+import { moneyDhForma } from '@/lib/utils';
 import ChatApp from '@/page/buyerPage/components/ChatApp';
 
-
-
-
-
-// 2. Define the Image Interface 
-// (Handling cases where image might be an object with a url or just a string)
+// ✅ Fix 1: Properly typed ProductImage
 type ProductImage = { url: string } | string;
 
+// ✅ Helper to safely extract URL from ProductImage
+const getImageUrl = (img: ProductImage): string => {
+  return typeof img === 'string' ? img : img.url;
+};
 
 interface Product {
   _id: string;
   productName: string;
   description: string;
   category: string;
-  condition: string; // or specific union: "Brand New" | "Grade A" | "Grade B" | "Fair"
+  condition: string;
   listingPrice: number;
   costPrice: number;
   status: string;
@@ -32,46 +31,49 @@ interface Product {
   updatedAt: string;
 }
 
-// 4. Define Props for the SpecCard Component
-
-
-
-
+const getConditionStyles = (condition: string): string => {
+  switch (condition) {
+    case 'Brand New':
+      return 'bg-yellow-400 text-yellow-950 border-yellow-500';
+    case 'Grade A':
+      return 'bg-green-500 text-white border-green-600';
+    case 'Grade B':
+      return 'bg-blue-500 text-white border-blue-600';
+    case 'Fair':
+      return 'bg-gray-600 text-white border-gray-700';
+    default:
+      return 'bg-white border-gray-200 text-gray-900';
+  }
+};
 
 export default function ProductPageSeller() {
   const [product, setProduct] = useState<Product | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const { id } = useParams<{ id: string }>();
 
+  // ✅ Fix 2: Type selectedImage as string | null (not `any`)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  
-const getConditionStyles = (condition: string): string => {
-  switch (condition) {
-    case "Brand New": 
-      return "bg-yellow-400 text-yellow-950 border-yellow-500";
-    case "Grade A":   
-      return "bg-green-500 text-white border-green-600";
-    case "Grade B":   
-      return "bg-blue-500 text-white border-blue-600";
-    case "Fair":      
-      return "bg-gray-600 text-white border-gray-700";
-    default:          
-      return "bg-white border-gray-200 text-gray-900";
-  }
-};
+  // ✅ Fix 3: productId will always be a string (fallback to '')
+  const { id = '' } = useParams<{ id: string }>();
 
   useEffect(() => {
-    setLoading(true);
+    if (!id) return;
+
+    // ✅ Fix 4: Avoid cascading renders — set all state ONCE after fetch
     axios
       .get(`http://localhost:4000/api/product/getProductDetails/${id}`)
       .then((res) => {
-        setProduct(res.data);
-        // Set the first image as default if available
-        if (res.data.images && res.data.images.length > 0) {
-          // Adjust '.url' depending on your actual image object structure (e.g., img.url or just img)
-          setSelectedImage(res.data.images[0].url || res.data.images[0]); 
-        }
+        const data: Product = res.data;
+
+        // ✅ Derive the first image URL using the helper
+        const firstImage =
+          data.images && data.images.length > 0
+            ? getImageUrl(data.images[0])
+            : null;
+
+        // ✅ Batch state updates together (avoids cascading renders)
+        setProduct(data);
+        setSelectedImage(firstImage);
         setLoading(false);
       })
       .catch((err) => {
@@ -83,95 +85,121 @@ const getConditionStyles = (condition: string): string => {
   if (loading) {
     return (
       <div className="flex h-screen w-full items-center justify-center bg-[#e2edf7]">
-        <div className="text-xl font-semibold text-blue-600">Loading product details...</div>
+        <div className="text-xl font-semibold text-blue-600">
+          Loading product details...
+        </div>
       </div>
     );
   }
 
   if (!product) return <p className="text-center mt-10">Product not found</p>;
-console.log(product)
+
   return (
     <div className="min-h-screen bg-[#ebedf0] rounded-4xl px-4 py-10">
       <div className="mx-auto flex w-full max-w-7xl flex-col">
-        
+
         {/* Navigation */}
         <div className="mb-6">
-          <Button variant="ghost" className="gap-2 pl-0 hover:bg-white px-2  text-blue-700 hover:text-blue-900">
+          <Button
+            variant="ghost"
+            className="gap-2 pl-0 hover:bg-white px-2 text-blue-700 hover:text-blue-900"
+          >
             <Link to="/dashboard/products" className="flex items-center gap-2">
               <ArrowLeft size={20} /> Back to Home
             </Link>
           </Button>
         </div>
-        
+
         <div className="flex flex-col gap-8 lg:flex-row">
-          
+
           {/* Left Column: Image Gallery */}
           <div className="flex h-fit w-full flex-col items-center justify-center gap-4 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
             <div className="relative flex aspect-square w-full items-center justify-center overflow-hidden rounded-xl bg-gray-50">
               {selectedImage ? (
-                <img 
-                  src={selectedImage} 
-                  alt={product.productName} 
-                  className="h-full w-full object-contain mix-blend-multiply" 
+                <img
+                  src={selectedImage}
+                  alt={product.productName}
+                  className="h-full w-full object-contain mix-blend-multiply"
                 />
               ) : (
                 <div className="text-gray-400">No Image Available</div>
               )}
             </div>
-            
+
             {/* Thumbnail Strip */}
             <div className="flex gap-4 overflow-x-auto py-2">
               {product.images?.map((img, index) => {
-                 const imgUrl = img.url || img; // Handle object or string
-                 return (
+                // ✅ Fix 5: Use helper instead of img.url directly
+                const imgUrl = getImageUrl(img);
+                return (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(imgUrl)}
                     className={`relative h-20 w-20 overflow-hidden rounded-lg border-2 bg-white transition-all ${
-                      selectedImage === imgUrl ? 'border-blue-600 ring-2 ring-blue-100' : 'border-gray-200 hover:border-blue-300'
+                      selectedImage === imgUrl
+                        ? 'border-blue-600 ring-2 ring-blue-100'
+                        : 'border-gray-200 hover:border-blue-300'
                     }`}
                   >
-                    <img src={imgUrl} alt={`View ${index}`} className="h-full w-full object-cover" />
+                    <img
+                      src={imgUrl}
+                      alt={`View ${index}`}
+                      className="h-full w-full object-cover"
+                    />
                   </button>
-                )
+                );
               })}
             </div>
           </div>
 
           {/* Right Column: Product Details */}
           <div className="flex h-auto w-full flex-col gap-6 rounded-2xl border-2 border-white bg-white p-6 shadow-sm lg:w-1/2">
-            
+
             {/* Header */}
             <div>
               <div className="mb-2 inline-flex items-center rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-700">
                 {product.category || 'Electronics'}
               </div>
-              <h1 className="text-3xl font-bold text-gray-900">{product.productName}</h1>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {product.productName}
+              </h1>
             </div>
 
             {/* Specs Grid */}
             <div className="grid grid-cols-2 gap-3">
-              {/* Condition Div */}
-              <div className={`flex flex-col justify-center rounded-xl border p-4 transition-all ${getConditionStyles(product.condition)}`}>
-                <span className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">Condition</span>
-                <span className="text-base font-bold capitalize leading-tight">{product.condition}</span>
+              <div
+                className={`flex flex-col justify-center rounded-xl border p-4 transition-all ${getConditionStyles(product.condition)}`}
+              >
+                <span className="text-[10px] font-bold uppercase tracking-widest opacity-70 mb-1">
+                  Condition
+                </span>
+                <span className="text-base font-bold capitalize leading-tight">
+                  {product.condition}
+                </span>
               </div>
 
-              {/* Color Div */}
               <div className="flex flex-col justify-center rounded-xl border border-gray-100 bg-gray-50 p-4 text-gray-900">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Color</span>
-                <span className="text-base font-bold capitalize leading-tight">{product.color}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
+                  Color
+                </span>
+                <span className="text-base font-bold capitalize leading-tight">
+                  {product.color}
+                </span>
               </div>
 
-              {/* Storage Div */}
               <div className="flex flex-col justify-center rounded-xl border border-gray-100 bg-gray-50 p-4 text-gray-900">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Storage</span>
-                <span className="text-base font-bold capitalize leading-tight">{product.storage}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
+                  Storage
+                </span>
+                <span className="text-base font-bold capitalize leading-tight">
+                  {product.storage}
+                </span>
               </div>
 
-              {/* Battery Health Div */}
               <div className="flex flex-col justify-center rounded-xl border border-gray-100 bg-gray-50 p-4 text-gray-900">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">Battery Health</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-gray-500 mb-1">
+                  Battery Health
+                </span>
                 <span className="text-base font-bold capitalize leading-tight">
                   {product.battery ? `${product.battery}%` : 'N/A'}
                 </span>
@@ -180,15 +208,17 @@ console.log(product)
 
             <hr className="border-gray-100" />
 
-            {/* Price & Action */}
+            {/* Price */}
             <div className="flex flex-col gap-1">
               <p className="text-sm text-gray-500">Total Price</p>
               <h1 className="text-4xl font-bold text-blue-600">
                 {moneyDhForma(product.listingPrice)}
               </h1>
             </div>
+
+            {/* ✅ Fix 6: productId guaranteed to be string */}
             <div>
-                 <ChatApp productId={id }/>  
+              <ChatApp productId={id} />
             </div>
           </div>
         </div>

@@ -2,7 +2,7 @@ import { LogOut,Store,User ,BadgeCheck } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 
-export default function UserIdNav({user  , logout}) {
+export default function UserIdNav({user, logout} : {user: any, logout: () => void}) {
   return (
     <div className="space-x-4 flex justify-center items-center">
         <div className='flex gap-2 rounded-full p-2 hover:bg-gray-200 cursor-pointer' >
