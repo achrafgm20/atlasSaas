@@ -1,0 +1,22 @@
+# Ignore dependencies
+node_modules
+
+# Ignore build output folder
+build
+dist
+
+# Ignore Docker files
+Dockerfile
+.dockerignore
+
+# Ignore source control files
+.git
+.gitignore
+
+# Ignore environment files
+.env*
+
+# Ignore logs and temporary files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
