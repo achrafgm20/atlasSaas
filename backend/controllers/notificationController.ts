@@ -53,3 +53,5 @@ export const viewDetails = asyncHandler(async(req:Request,res:Response) => {
     const redirect = notification.type === "order" ? {to : "orders-details",orderId:notification.targetId} : {to:"product-chat",productId:notification.targetId,conversationId:notification.conversationId}
     res.status(200).json({message:"notofication marked as readadaaadad ",redirect})
 })
+
+

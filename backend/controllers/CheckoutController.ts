@@ -100,23 +100,23 @@ export const createCheckoutSession = asyncHandler(async(req:Request,res:Response
             stripeSessionId:session.id,
             status:"pending"
         })
-        for(let item of order.items){
-            const sellerId = item.sellerId.toString()
-            await Notification.create({
-                user:item.sellerId,
-                type:"order",
-                title:"New Order",
-                body:"You received a new order",
-                targetType:"order",
-                targetId:order._id
-            })
-            io.to(sellerId).emit("notification",{
-                type:"order",
-                title:"New Order",
-                body:`You received a new Order for ${item.productName}`,
-                orderId:order._id,
-            })
-        }
+        // for(let item of order.items){
+        //     const sellerId = item.sellerId.toString()
+        //     await Notification.create({
+        //         user:item.sellerId,
+        //         type:"order",
+        //         title:"New Order",
+        //         body:"You received a new order",
+        //         targetType:"order",
+        //         targetId:order._id
+        //     })
+        //     io.to(sellerId).emit("notification",{
+        //         type:"order",
+        //         title:"New Order",
+        //         body:`You received a new Order for ${item.productName}`,
+        //         orderId:order._id,
+        //     })
+        // }
         
             
             res.status(200).json({url:session.url})
@@ -181,6 +181,23 @@ export const webHook = asyncHandler(async(req:Request,res:Response) => {
              res.status(400).json({message:"order not found"})
              return
               }
+              for(let item of order.items){
+            const sellerId = item.sellerId.toString()
+            await Notification.create({
+                user:item.sellerId,
+                type:"order",
+                title:"New Order",
+                body:"You received a new order",
+                targetType:"order",
+                targetId:order._id
+            })
+            io.to(sellerId).emit("notification",{
+                type:"order",
+                title:"New Order",
+                body:`You received a new Order for ${item.productName}`,
+                orderId:order._id,
+            })
+        }
             const admin_perct = 10
             for(let item of order.items){
                 const adminFee = Math.round(item.price * 100 * admin_perct / 100 )

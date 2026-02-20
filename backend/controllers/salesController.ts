@@ -191,7 +191,7 @@ export const getAdminGains = asyncHandler(async(req:Request,res:Response) => {
     try {
         const adminPercent = 10 
         const stats = await Order.aggregate([
-            {$match:{status:"paid"}},
+            {$match:{$or:[{"status":"paid"},{"status":"delivered"}]}},
             {$unwind:"$items"}, 
             {$group:{
                 _id:null,
