@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'; // Import useState and useEffect
+import  { useState, useEffect } from 'react';
 import { moneyDhForma } from "@/lib/utils";
 
 export default function StartCards({products}: {products: Array<{listingPrice: number}>} ) {
@@ -7,26 +7,54 @@ export default function StartCards({products}: {products: Array<{listingPrice: n
         totalInventory += product.listingPrice;
     });
 
-    // State to hold the number of pending messages
     const [pendingMessages, setPendingMessages] = useState(0);
     const [isLoadingMessages, setIsLoadingMessages] = useState(true);
-    const [errorMessages, setErrorMessages] = useState(null);
+    const [errorMessages, setErrorMessages] = useState<string | null>(null); // Explicitly type errorMessages
 
-    // useEffect hook to fetch data when the component mounts
     useEffect(() => {
         const fetchPendingMessages = async () => {
+            setIsLoadingMessages(true); // Ensure loading state is true at the start of fetch
+            setErrorMessages(null);    // Clear previous errors
+
+            // --- Get the bearer token ---
+            const token = localStorage.getItem('token'); // Replace 'yourAuthTokenKey' with your actual key
+
+            if (!token) {
+                // Handle case where token is not found (e.g., user not logged in)
+                console.warn("No authentication token found. Cannot fetch pending messages.");
+                setErrorMessages("Authentication required.");
+                setIsLoadingMessages(false);
+                return;
+            }
+
+            // --- Construct headers with Authorization token ---
+            const headers: HeadersInit = {
+                'Content-Type': 'application/json', // Good practice, though not strictly required for GET
+                'Authorization': `Bearer ${token}` // Add the Bearer token
+            };
+
             try {
-                const response = await fetch('http://localhost:4000/api/notification/nbrPendingMessage');
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                const response = await fetch('http://localhost:4000/api/notification/nbrPendingMessage', {
+                    method: 'GET', // Or 'POST' if your API expects it
+                    headers: headers,
+                });
+
+                if (response.status === 401) {
+                    // Handle unauthorized access (e.g., token expired or invalid)
+                    throw new Error("Unauthorized: Please log in again.");
                 }
+                if (!response.ok) {
+                    const errorBody = await response.text(); // Get text for better error message
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorBody}`);
+                }
+
                 const data = await response.json();
-                // Assuming the API directly returns the number, e.g., 19
-                // If the API returns an object like { count: 19 }, you would use data.count
+                // Assuming the API returns the number directly.
+                // If it's an object like { count: 19 }, use data.count
                 setPendingMessages(data);
             } catch (error: any) {
                 console.error("Failed to fetch pending messages:", error);
-                setErrorMessages(error.message);
+                setErrorMessages(error.message || "Failed to load messages.");
             } finally {
                 setIsLoadingMessages(false);
             }
@@ -55,7 +83,7 @@ export default function StartCards({products}: {products: Array<{listingPrice: n
             {isLoadingMessages ? (
                 <h1 className='text-gray-500 border-gray-100'>Loading...</h1>
             ) : errorMessages ? (
-                <h1 className='text-red-500 border-red-100'>Error</h1>
+                <h1 className='text-red-500 border-red-100'>{errorMessages}</h1>
             ) : (
                 <h1 className='text-orange-500 border-orange-100'>{pendingMessages}</h1>
             )}

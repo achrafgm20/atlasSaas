@@ -4,7 +4,6 @@ import { io, Socket } from "socket.io-client";
 
 const SOCKET_URL = "http://localhost:4000";
 
-// ✅ UPDATED: Interface matching your ACTUAL backend data
 interface Notification {
   _id: string;
   title: string;
@@ -12,9 +11,9 @@ interface Notification {
   type: "order" | "message";
   isRead: boolean;
   user: string;
-  targetId: string;        // product ID or order ID
-  targetType: string;      // "product" or "order"
-  conversationId?: string; // conversation/discussion ID (for messages)
+  targetId: string;
+  targetType: string;
+  conversationId?: string;
   createdAt: string;
   updatedAt: string;
   __v?: number;
@@ -348,25 +347,38 @@ export function Notifications() {
     {} as Record<string, Notification[]>
   );
 
+  // ✅ FIXED: markAsRead - uses PATCH + correct endpoint + rollback on error
   const markAsRead = async (id: string) => {
+    // Optimistic update
     setNotifications((prev) =>
       prev.map((n) => (n._id === id ? { ...n, isRead: true } : n))
     );
 
-    // ✅ Also mark as read on the backend
     try {
-      await fetch(`http://localhost:4000/api/notification/markAsRead/${id}`, {
-        method: "PUT",
-        headers: {
-          Authorization: `Bearer ${token}`,
-          "Content-Type": "application/json",
-        },
-      });
+      const response = await fetch(
+        `http://localhost:4000/api/notification/markNotifAsRead/${id}`,
+        {
+          method: "PATCH",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to mark notification as read");
+      }
     } catch (err) {
       console.error("Failed to mark notification as read on server:", err);
+      // Rollback on failure
+      setNotifications((prev) =>
+        prev.map((n) => (n._id === id ? { ...n, isRead: false } : n))
+      );
     }
   };
 
+  // ✅ markAsUnread - local only (add backend endpoint if you have one)
   const markAsUnread = async (id: string) => {
     setNotifications((prev) =>
       prev.map((n) => (n._id === id ? { ...n, isRead: false } : n))
@@ -387,32 +399,23 @@ export function Notifications() {
     }
   };
 
-  // =====================================================
-  //  ✅ HANDLE NOTIFICATION CLICK (clicking the body)
-  // =====================================================
+  // Handle notification click
   const handleNotificationClick = (notification: Notification) => {
     markAsRead(notification._id);
     navigateToTarget(notification);
   };
 
-  // =====================================================
-  //  ✅ HANDLE VIEW DETAILS CLICK
-  // =====================================================
+  // Handle view details click
   const handleViewDetails = (notification: Notification, event: React.MouseEvent) => {
     event.stopPropagation();
     markAsRead(notification._id);
     navigateToTarget(notification);
   };
 
-  // =====================================================
-  //  ✅ CENTRAL NAVIGATION LOGIC
-  //  Based on notification.type and notification.targetId
-  // =====================================================
+  // Central navigation logic
   const navigateToTarget = (notification: Notification) => {
     switch (notification.type) {
       case "order":
-        // Order notification → go to orders page
-        // If you want to highlight a specific order, you can append the targetId
         if (notification.targetId) {
           navigate(`/dashboard/orders?orderId=${notification.targetId}`);
         } else {
@@ -421,7 +424,6 @@ export function Notifications() {
         break;
 
       case "message":
-        // Message notification → go to the product page using targetId
         if (notification.targetId) {
           navigate(`/dashboard/ProductPageSeller/${notification.targetId}`);
         } else {
@@ -437,17 +439,77 @@ export function Notifications() {
     }
   };
 
-  const markAllAsRead = () => {
+  // ✅ FIXED: markAllAsRead - calls API for each unread notification
+  const markAllAsRead = async () => {
+    const unreadNotifications = notifications.filter((n) => !n.isRead);
+
+    // Optimistic update
     setNotifications((prev) => prev.map((n) => ({ ...n, isRead: true })));
+
+    try {
+      await Promise.all(
+        unreadNotifications.map((n) =>
+          fetch(
+            `http://localhost:4000/api/notification/markNotifAsRead/${n._id}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        )
+      );
+    } catch (err) {
+      console.error("Failed to mark all as read:", err);
+      // Rollback on failure
+      setNotifications((prev) =>
+        prev.map((n) => {
+          const wasUnread = unreadNotifications.find((un) => un._id === n._id);
+          return wasUnread ? { ...n, isRead: false } : n;
+        })
+      );
+    }
   };
 
-  const markSelectedAsRead = () => {
+  // ✅ FIXED: markSelectedAsRead - calls API for each selected notification
+  const markSelectedAsRead = async () => {
+    const selected = [...selectedNotifications];
+
+    // Optimistic update
     setNotifications((prev) =>
       prev.map((n) =>
-        selectedNotifications.includes(n._id) ? { ...n, isRead: true } : n
+        selected.includes(n._id) ? { ...n, isRead: true } : n
       )
     );
     setSelectedNotifications([]);
+
+    try {
+      await Promise.all(
+        selected.map((id) =>
+          fetch(
+            `http://localhost:4000/api/notification/markNotifAsRead/${id}`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization: `Bearer ${token}`,
+                "Content-Type": "application/json",
+              },
+            }
+          )
+        )
+      );
+    } catch (err) {
+      console.error("Failed to mark selected as read:", err);
+      // Rollback on failure
+      setNotifications((prev) =>
+        prev.map((n) =>
+          selected.includes(n._id) ? { ...n, isRead: false } : n
+        )
+      );
+      setSelectedNotifications(selected);
+    }
   };
 
   // Loading state
@@ -647,7 +709,7 @@ export function Notifications() {
                                     {notification.body}
                                   </p>
 
-                                  {/* ✅ Show type badge for clarity */}
+                                  {/* Type badge */}
                                   <div className="flex items-center space-x-2 mt-2">
                                     <span
                                       className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
@@ -690,7 +752,6 @@ export function Notifications() {
                                 </button>
                               )}
 
-                              {/* ✅ UPDATED: View details navigates based on type */}
                               <button
                                 onClick={(e) => handleViewDetails(notification, e)}
                                 className="text-xs font-medium text-blue-600 hover:text-blue-700 transition-colors"
