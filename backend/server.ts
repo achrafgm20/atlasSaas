@@ -31,7 +31,7 @@ const app = express()
 const port = process.env.PORT  || 5000
 connctDB()
 app.use(cors({
-    origin: "http://localhost:5173", 
+    origin:["http://localhost:5173","http://localhost:8080"],
     credentials: true
 }))
 
@@ -71,7 +71,8 @@ console.log({
 const server = createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173","http://localhost:8080"],
+    
     methods: ["GET", "POST"],
     credentials: true,
   },
