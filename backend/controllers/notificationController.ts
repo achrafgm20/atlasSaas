@@ -11,7 +11,7 @@ export const getAllNotification = asyncHandler(async(req:Request,res:Response) =
             res.status(403).json({message:"seller is not found"})
             return
         }
-        const notifications = await Notification.find({user:sellerId,isRead:false}).sort({ createdAt: -1 })
+        const notifications = await Notification.find({user:sellerId}).sort({ createdAt: -1 })
         res.status(200).json({message:"get your notification succufully  ",notifications})
     }catch(err){
         res.status(404).json({message:"error fetching notifications",err})
@@ -52,4 +52,24 @@ export const viewDetails = asyncHandler(async(req:Request,res:Response) => {
     notification.save()
     const redirect = notification.type === "order" ? {to : "orders-details",orderId:notification.targetId} : {to:"product-chat",productId:notification.targetId,conversationId:notification.conversationId}
     res.status(200).json({message:"notofication marked as readadaaadad ",redirect})
+})
+
+
+
+
+export const nbrPendingMessage = asyncHandler(async(req:Request,res:Response) => {
+    try {
+        const sellerId = req.user 
+        const seller = await User.findById(sellerId)
+        if(!seller){
+            res.status(400).json({message:"seller of this notification not found "})
+            return
+        }
+        const nbrPendingMessage = await Notification.find({user:seller,isRead:false}).countDocuments()
+        res.status(200).json(nbrPendingMessage)
+    }catch(err){
+        res.status(404).json({message:"can t get number of pending messages",err})
+        console.error(err);
+        
+    }
 })
