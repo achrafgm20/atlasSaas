@@ -16,3 +16,12 @@ services:
     environment:
       - NODE_ENV=development
     restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: atlas-saas-frontend
+    ports:
+      - "8080:80"
+    restart: always
