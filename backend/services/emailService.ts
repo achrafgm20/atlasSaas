@@ -63,3 +63,38 @@ Thank you for shopping with AtlasTech!`,
     `
   });
 }
+
+
+
+export const sendSellerStatusEmail = async (sellerEmail: string, statutCompte: string) => {
+  const subject = statutCompte === "Approved" 
+    ? "Your seller account has been approved " 
+    : "Your seller account has been rejected ";
+
+  const message = statutCompte === "Approved"
+    ? `Congratulations! Your seller account has been approved. You can now start listing products on AtlasTech.`
+    : `We’re sorry! Your seller account has been rejected. Please contact support for more details.`;
+
+  const htmlMessage = `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; background-color: #f9f9f9;">
+      <h2 style="color: #2E86C1; text-align: center;">${statutCompte === "Approved" ? "Congratulations!" : "Account Update"}</h2>
+      <p style="font-size: 16px; color: #333;">Hi ${sellerEmail},</p>
+      <p style="font-size: 16px; color: #333;">
+        ${message}
+      </p>
+      <p style="font-size: 16px; color: #333;">Thank you for choosing <strong>AtlasTech</strong>.</p>
+      <hr style="border: none; border-top: 1px solid #ddd; margin: 20px 0;" />
+      <p style="font-size: 12px; color: #999; text-align: center;">
+        If you have any questions, contact us at <a href="mailto:${process.env.EMAIL_USER}" style="color: #2E86C1;">${process.env.EMAIL_USER}</a>.
+      </p>
+    </div>
+  `;
+
+  await transporter.sendMail({
+    from: `"AtlasTech" <${process.env.EMAIL_USER}>`,
+    to: sellerEmail,
+    subject,
+    text: message,
+    html: htmlMessage
+  });
+};
