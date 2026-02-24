@@ -13,7 +13,7 @@ export interface IProduct extends Document {
         public_id: string;
     }[];   
     listingPrice:number;
-    status:"Active"|"Draft";
+    status:"Active"|"Draft"|"Sold";
     storage?:"64GB"|"128GB"|"256GB"|"512GB"|"1TB";
     seller:Types.ObjectId;
     createdAt: Date;

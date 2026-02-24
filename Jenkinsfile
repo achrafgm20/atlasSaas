@@ -17,12 +17,28 @@ pipeline {
         }
     }
 
+    // post {
+    //     success {
+    //         echo 'AtlasSaas deployed successfully 🚀'
+    //     }
+    //     failure {
+    //         echo 'Deployment failed ❌'
+    //     }
+    // }
     post {
-        success {
-            echo 'AtlasSaas deployed successfully 🚀'
-        }
-        failure {
-            echo 'Deployment failed ❌'
-        }
+    success {
+        emailext(
+            subject: "Deployment SUCCESS",
+            body: "Build successful",
+            to: "yourname@gmail.com"
+        )
     }
+    failure {
+        emailext(
+            subject: "Deployment FAILED",
+            body: "Check console: ${env.BUILD_URL}console",
+            to: "yourname@gmail.com"
+        )
+    }
+}
 }
