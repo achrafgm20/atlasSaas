@@ -36,7 +36,7 @@ pipeline {
     failure {
         emailext(
             subject: "Deployment FAILED",
-            body: "Check console: ${env.BUILD_URL}console",
+            body: "Build failed",
             to: "hibaaitabdellah81@gmail.com"
         )
     }
