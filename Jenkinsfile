@@ -30,14 +30,14 @@ pipeline {
         emailext(
             subject: "Deployment SUCCESS",
             body: "Build successful",
-            to: "yourname@gmail.com"
+            to: "hibaaitabdellah81@gmail.com"
         )
     }
     failure {
         emailext(
             subject: "Deployment FAILED",
             body: "Check console: ${env.BUILD_URL}console",
-            to: "yourname@gmail.com"
+            to: "hibaaitabdellah81@gmail.com"
         )
     }
 }
