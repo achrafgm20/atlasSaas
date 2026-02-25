@@ -1,4 +1,3 @@
-
 import { ShoppingCart, Heart, BadgeCheck } from 'lucide-react';
 import { moneyDhForma } from '@/lib/utils';
 import { Link } from 'react-router-dom';
@@ -14,7 +13,7 @@ interface Product {
   condition: string;
   listingPrice: number;
   battery: string;
-  seller: { _id: number; name: string };
+  seller: { _id: number; name: string } | null;
 }
 
 interface ProductCardProps {
@@ -24,6 +23,8 @@ interface ProductCardProps {
 const ProductCard = ({ product }: ProductCardProps) => {
   const { addToCart } = useCart();
   const { addToFavorites, deleteFromFavorites, isFavorite } = useFavorite();
+
+  if (!product) return null;
 
   const gradeClass =
     product.condition === 'Brand New'
@@ -109,7 +110,9 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {/* Seller */}
           <div className="border-t border-gray-100 pt-3 flex items-center justify-between">
             <p className="text-gray-400">Store:</p>
-            <h2 className="font-semibold">{product.seller.name}</h2>
+            <h2 className="font-semibold">
+              {product.seller?.name ?? 'Unknown Seller'}
+            </h2>
             <BadgeCheck className="text-blue-700" />
           </div>
 
