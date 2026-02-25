@@ -17,12 +17,28 @@ pipeline {
         }
     }
 
+    // post {
+    //     success {
+    //         echo 'AtlasSaas deployed successfully 🚀'
+    //     }
+    //     failure {
+    //         echo 'Deployment failed ❌'
+    //     }
+    // }
     post {
-        success {
-            echo 'AtlasSaas deployed successfully 🚀'
-        }
-        failure {
-            echo 'Deployment failed ❌'
-        }
+    success {
+        emailext(
+            subject: "Deployment SUCCESS",
+            body: "Build successful",
+            to: "hibaaitabdellah81@gmail.com"
+        )
     }
+    failure {
+        emailext(
+            subject: "Deployment FAILED",
+            body: "Build failed",
+            to: "hibaaitabdellah81@gmail.com"
+        )
+    }
+}
 }

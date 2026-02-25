@@ -20,7 +20,7 @@ export interface IOrder extends Document{
     items:IOrderItem[]
     totalAmount:number,
     stripeSessionId:string,
-    status:"pending" | "paid" | "failed"
+    status:"pending" | "paid" | "delivered"
     shippingAddress?: IAddress;
     billingAddress?: IAddress;
     customerEmail?: string;
