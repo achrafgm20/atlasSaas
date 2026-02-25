@@ -16,9 +16,10 @@ export const Trend = asyncHandler(async(req:Request,res:Response) => {
             { $match: {$and :[
                 {$or:[
                 {"items.sellerId": new mongoose.Types.ObjectId(sellerId) },
-                {"items.sellerId":sellerId}
-             ]},
-            {status:"paid"}
+                {"items.sellerId":sellerId},
+                {"status":"paid"},
+                {"status":"delivered"}
+             ]}
             ]
             } },
             {$group:{
@@ -167,7 +168,10 @@ export const trendLastDaysAdmin = asyncHandler(async(req:Request,res:Response) =
         sevenDaysAgo.setDate(sevenDaysAgo.getDate() -7)
 
         const orders =await Order.aggregate([
-            {$match:{status:"paid",createdAt:{$gte:sevenDaysAgo}}},
+            {$match: {
+      $or: [{ status: "paid" }, { status: "delivered" }],
+      createdAt: { $gte: sevenDaysAgo }
+    }},
             {$group:{
                 _id:{
                 $dateToString:{format: "%Y-%m-%d" ,date:"$createdAt"}
