@@ -6,6 +6,7 @@ import jwt = require("jsonwebtoken");
 import Stripe from "stripe";
 import message from "../models/message";
 import { sendSellerStatusEmail } from "../services/emailService";
+import Product from "../models/productModel";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 // function register
 // export const registerUser = asyncHandler(async (req:Request,res:Response) => {
@@ -431,17 +432,36 @@ export const getAllUsers = asyncHandler(async (req: Request, res: Response) => {
   res.status(200).json(users);
 });
 
+// export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
+//   const { userIdToDelete } = req.params;
+//   const user = await User.findById(userIdToDelete);
+//   if (!user) {
+//     res.status(404).json("user not found");
+//     console.error("user not found");
+//   }
+//   if (user?.role === "Admin") {
+//     res.status(403).json("you can t delete an admin account ");
+//   }
+//   await user?.deleteOne();
+//   res.status(200).json({ message: "User deleted successfully" });
+// });
+
 export const deleteUser = asyncHandler(async (req: Request, res: Response) => {
   const { userIdToDelete } = req.params;
   const user = await User.findById(userIdToDelete);
+
   if (!user) {
     res.status(404).json("user not found");
-    console.error("user not found");
+    return;
   }
-  if (user?.role === "Admin") {
-    res.status(403).json("you can t delete an admin account ");
+  if (user.role === "Admin") {
+    res.status(403).json("you can't delete an admin account");
+    return;
   }
-  await user?.deleteOne();
+
+  await Product.deleteMany({ seller: user._id });
+  await user.deleteOne();
+  
   res.status(200).json({ message: "User deleted successfully" });
 });
 
