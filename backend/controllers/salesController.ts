@@ -128,8 +128,7 @@ export const trendMonthAdmin = asyncHandler(async(req:Request,res:Response) => {
     try {
         const stats = await Order.aggregate([
          { $match: 
-            {status:"paid"}        
-            },
+{$or: [{ status: "paid" }, { status: "delivered" }]} },
             {$group:{
                 _id:{$month:"$createdAt"},
                 totalRevenue : {$sum:"$totalAmount"},
@@ -231,7 +230,7 @@ export const getAdmiCards = asyncHandler(async(req:Request,res:Response) => {
         const totalProducts = await Product.countDocuments()
         const revenueResult = await Order.aggregate([
             //change this line 
-            {$match:{status:"paid"}},
+            {$match:{$or: [{ status: "paid" }, { status: "delivered" }]}},
             {$group:{
                 _id:null,
                 total:{$sum:"$totalAmount"}
