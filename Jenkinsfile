@@ -19,10 +19,10 @@ pipeline {
 
     // post {
     //     success {
-    //         echo 'AtlasSaas deployed successfully 🚀'
+    //         echo 'AtlasSaas deployed successfully '
     //     }
     //     failure {
-    //         echo 'Deployment failed ❌'
+    //         echo 'Deployment failed '
     //     }
     // }
     post {
